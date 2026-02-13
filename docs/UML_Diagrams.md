@@ -42,8 +42,9 @@ flowchart TD
     Login --> Auth{Authenticated?}
     Auth -- No --> SignUp[Sign Up / Login via Clerk]
     SignUp --> Onboard[Onboarding: Industry & Skills]
+    Onboard --> ProfileSetup[Profile Setup & Review]
     Auth -- Yes --> Dash[Dashboard: Industry Insights<br/>Trending Tech & Skills]
-    Onboard --> Dash
+    ProfileSetup --> Dash
     
     Dash --> Choice{Select Feature}
     
@@ -189,8 +190,9 @@ graph TD
     C --> B
     B -- Yes --> D{Is Onboarded?}
     D -- No --> E[Onboarding Form]
-    E --> F[Save to DB]
-    F --> G[Dashboard: Industry Insights]
+    E --> F[Profile Setup]
+    F --> F2[Save to DB]
+    F2 --> G[Dashboard: Industry Insights]
     D -- Yes --> G
     
     G --> H[Resume Builder]

@@ -11,9 +11,9 @@ export async function improveWithAI({ current, type }) {
     if (!userId) throw new Error("Unauthorized");
 
     const prompt = `
-    As an expert resume writer, please improve the following ${type} to be more professional, engaging, and concise. 
+    As an expert writer, please improve the following ${type} to be more professional, engaging, and concise. 
     Maintain the original meaning but enhance the clarity and impact.
-    The output should be slightly more detailed and elaborate than the original, providing a comprehensive overview.
+    The output should be slightly more detailed and elaborate than the original, providing a comprehensive overview within 50 words.
     
     Original text:
     "${current}"

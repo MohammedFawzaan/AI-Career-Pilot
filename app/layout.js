@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "AI Career Coach",
+  title: "AI Career Pilot",
   description: "",
 };
 
@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
 
             <footer className="bg-gray-300 py-12">
               <div className="container mx-auto px-4 text-center text-black font-bold">
-                <p>Made with 💗 by Fawzaan & Team.</p>
+                <p>Made with 💗 by Mohammed Fawzaan & Team</p>
               </div>
             </footer>
           </ThemeProvider>

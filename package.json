@@ -1,7 +1,10 @@
 {
-  "name": "ai-career-coach",
+  "name": "ai-career-pilot",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Mohammed Fawzaan"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

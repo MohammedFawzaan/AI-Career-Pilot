@@ -29,7 +29,7 @@ export default async function Header() {
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <h1 className="text-2xl md:text-3xl font-bold gradient-title">
-            AI Career Coach
+            AI Career Pilot
           </h1>
         </Link>
 
