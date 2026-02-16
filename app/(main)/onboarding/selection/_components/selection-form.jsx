@@ -70,7 +70,7 @@ export default function SelectionForm() {
                         <Briefcase className="h-8 w-8 text-primary" />
                     </div>
                     <div>
-                        <h3 className="text-2xl font-bold mb-2">Dedicated to a specific field</h3>
+                        <h3 className="text-2xl font-bold mb-2">Dedicated to a Specific Field</h3>
                         <p className="text-muted-foreground">
                             I have expertise in some specific domain and want to advance my career, gain skills, or get salary insights.
                         </p>

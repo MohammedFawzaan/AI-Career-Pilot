@@ -138,7 +138,7 @@ export default function AssessmentForm() {
             const result = await submitAssessment(finalData);
             if (result) {
                 toast.success("Assessment completed!");
-                router.push("/onboarding/result");
+                router.push("/onboarding/career-path");
             }
         } catch (error) {
             console.error(error);

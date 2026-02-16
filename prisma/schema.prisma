@@ -29,11 +29,14 @@ model User {
   
   // Relations
   skills        String[]  // Array of skills
+  country       String?   // User's country for location-based job search
+  city          String?   // User's city for location-based job search
   assessments   Assessment[]
   resume        Resume?
   coverLetter   CoverLetter[]
   userType      UserType? // Enum to store if user is fresher or experienced
   careerAssessment CareerAssessment?
+  careerRoadmap CareerRoadmap?
 }
 
 model Assessment {
@@ -106,12 +109,37 @@ model IndustryInsight {
 }
 
 model CareerAssessment {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id])
-  questions     Json[]    // Array of {questionId, answer}
-  primaryRole   String    // Top recommended role
-  analysis      Json      // Complete AI analysis including secondary options, learning path, etc.
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                    String              @id @default(cuid())
+  userId                String              @unique
+  user                  User                @relation(fields: [userId], references: [id])
+  questions             Json[]              // Array of {questionId, answer}
+  primaryRole           String?             // Top recommended role (optional - user selects)
+  analysis              Json                // Complete AI analysis including secondary options, learning path, etc.
+  recommendedCountries  Json[]              // Country recommendations based on role demand
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  feedback              AssessmentFeedback?
+}
+
+model AssessmentFeedback {
+  id                String           @id @default(cuid())
+  assessmentId      String           @unique
+  assessment        CareerAssessment @relation(fields: [assessmentId], references: [id])
+  rating            Int              // 1-5 stars
+  comment           String?          @db.Text
+  isAccurate        Boolean          // Did the assessment match expectations?
+  createdAt         DateTime         @default(now())
+  
+  @@index([assessmentId])
+}
+
+model CareerRoadmap {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id])
+  duration          Int       // 3, 6, or 8 months
+  roadmapData       Json      // AI-generated roadmap structure
+  progress          Json      // Track completed items
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
