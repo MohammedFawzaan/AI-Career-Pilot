@@ -51,6 +51,8 @@ const ProfileForm = ({ industries, initialData }) => {
             experience: initialData?.experience?.toString() || "",
             bio: initialData?.bio || "",
             skills: initialData?.skills?.join(", ") || "",
+            country: initialData?.country || "",
+            city: initialData?.city || "",
         },
     });
 
@@ -270,6 +272,36 @@ const ProfileForm = ({ industries, initialData }) => {
                         {errors.experience && (
                             <p className="text-sm text-red-500">
                                 {errors.experience.message}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="country">Country</Label>
+                        <Input
+                            id="country"
+                            placeholder="e.g., United States, India, United Kingdom"
+                            {...register("country")}
+                        />
+                        <p className="text-xs text-muted-foreground">Helps find local internships</p>
+                        {errors.country && (
+                            <p className="text-sm text-red-500">
+                                {errors.country.message}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                            id="city"
+                            placeholder="e.g., New York, Bangalore, London"
+                            {...register("city")}
+                        />
+                        <p className="text-xs text-muted-foreground">Helps find local internships</p>
+                        {errors.city && (
+                            <p className="text-sm text-red-500">
+                                {errors.city.message}
                             </p>
                         )}
                     </div>

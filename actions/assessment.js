@@ -90,6 +90,11 @@ export async function submitAssessment(fullProfile) {
                     { "role": "Second Best Role", "description": "Brief description", "matchReason": "Why this role fits specific traits" },
                     { "role": "Third Best Role", "description": "Brief description", "matchReason": "Why this role fits specific traits" }
                 ],
+                "recommendedCountries": [
+                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why this country has opportunities for these roles" },
+                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why this country has opportunities for these roles" },
+                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why this country has opportunities for these roles" }
+                ],
                 "identifiedSkills": [
                     "Skill 1 (User has)", "Skill 2 (User has)"
                 ],
@@ -109,6 +114,7 @@ export async function submitAssessment(fullProfile) {
             - 'identifiedSkills': Extract skills the user *explicitly mentioned* or *demonstrated* in their answers.
             - 'recommendedSkills': Suggest skills they *need* for the recommended roles but might lack.
             - 'skillGap': same as recommendedSkills but with priority.
+            - 'recommendedCountries': Suggest 3-5 countries with high demand for the recommended roles, considering global job markets.
         `;
 
         const result = await model.generateContent(prompt);
@@ -128,15 +134,17 @@ export async function submitAssessment(fullProfile) {
             where: { userId: user.id },
             update: {
                 questions: [fullProfile], // Store full conversational profile
-                primaryRole: analysis.recommendedRoles[0].role,
+                primaryRole: null, // Let user select their preferred role
                 analysis: analysis,
+                recommendedCountries: analysis.recommendedCountries || [],
                 updatedAt: new Date(),
             },
             create: {
                 userId: user.id,
                 questions: [fullProfile], // Store full conversational profile
-                primaryRole: analysis.recommendedRoles[0].role,
+                primaryRole: null, // Let user select their preferred role
                 analysis: analysis,
+                recommendedCountries: analysis.recommendedCountries || [],
             },
         });
 

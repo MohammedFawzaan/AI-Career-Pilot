@@ -9,6 +9,8 @@ import {
   StarsIcon,
   User,
   Target,
+  Briefcase,
+  MapIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
@@ -59,14 +61,30 @@ export default async function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {user?.industry && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
-                      <User className="h-4 w-4" />
-                      My Profile
-                    </Link>
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                    <User className="h-4 w-4" />
+                    My Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/onboarding/career-path" className="flex items-center gap-2 cursor-pointer">
+                    <Target className="h-4 w-4" />
+                    Career Path
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/internships" className="flex items-center gap-2 cursor-pointer">
+                    <Briefcase className="h-4 w-4" />
+                    Internships & Certificates
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/roadmap" className="flex items-center gap-2 cursor-pointer">
+                    <MapIcon className="h-4 w-4" />
+                    Career Roadmap
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/resume" className="flex items-center gap-2 cursor-pointer">
                     <FileText className="h-4 w-4" />
@@ -82,14 +100,6 @@ export default async function Header() {
                     Cover Letter
                   </Link>
                 </DropdownMenuItem>
-                {user?.userType !== "EXPERIENCED" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/onboarding/result" className="flex items-center gap-2 cursor-pointer">
-                      <Target className="h-4 w-4" />
-                      Career Path
-                    </Link>
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem asChild>
                   <Link href="/interview" className="flex items-center gap-2 cursor-pointer">
                     <GraduationCap className="h-4 w-4" />

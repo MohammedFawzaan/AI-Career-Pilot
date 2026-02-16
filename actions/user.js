@@ -12,6 +12,9 @@ export async function getUser() {
 
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
+    include: {
+      careerAssessment: true,
+    },
   });
 
   return user;
@@ -69,6 +72,8 @@ export async function updateUser(data) {
             experience: data.experience,
             bio: data.bio,
             skills: data.skills,
+            country: data.country,
+            city: data.city,
           },
         });
 
@@ -200,5 +205,30 @@ export async function getUserOnboardingStatus() {
   } catch (error) {
     console.error("Error checking onboarding status:", error);
     throw new Error("Failed to check onboarding status");
+  }
+}
+
+export async function updatePrimaryRole(selectedRole) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    // Update the primaryRole in CareerAssessment
+    const assessment = await db.careerAssessment.update({
+      where: { userId: user.id },
+      data: { primaryRole: selectedRole },
+    });
+
+    revalidatePath("/");
+    return assessment;
+  } catch (error) {
+    console.error("Error updating primary role:", error);
+    throw new Error("Failed to update primary role: " + error.message);
   }
 }

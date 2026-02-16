@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Trophy, Target, BookOpen, Lightbulb, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import RoleCard from "./_components/role-card";
+import CountryRecommendations from "./_components/country-recommendations";
+import FeedbackForm from "./_components/feedback-form";
+import FeedbackStats from "./_components/feedback-stats";
 
 export default async function AssessmentResultPage() {
     const user = await getUser();
@@ -15,10 +18,11 @@ export default async function AssessmentResultPage() {
     // Fetch the latest assessment
     const assessment = await db.careerAssessment.findUnique({
         where: { userId: user.id },
+        include: { feedback: true },
     });
 
     if (!assessment) {
-        redirect("/onboarding/assessment");
+        redirect("/onboarding/selection");
     }
 
     const { analysis } = assessment;
@@ -56,10 +60,19 @@ export default async function AssessmentResultPage() {
                     </h2>
                     <div className="grid md:grid-cols-3 gap-6">
                         {analysis.recommendedRoles.map((role, index) => (
-                            <RoleCard key={index} role={role} index={index} analysis={analysis} />
+                            <RoleCard
+                                key={index}
+                                role={role}
+                                index={index}
+                                analysis={analysis}
+                                selectedRole={assessment.primaryRole}
+                            />
                         ))}
                     </div>
                 </div>
+
+                {/* Country Recommendations */}
+                <CountryRecommendations countries={analysis.recommendedCountries} />
 
                 {/* Skills Gap */}
                 <Card className="col-span-1 md:col-span-2">
@@ -102,6 +115,16 @@ export default async function AssessmentResultPage() {
                         </ul>
                     </CardContent>
                 </Card>
+            </div>
+
+            {/* Feedback Stats */}
+            <div className="grid gap-6 mb-8">
+                <FeedbackStats />
+            </div>
+
+            {/* Feedback Form */}
+            <div className="grid gap-6 mb-8">
+                <FeedbackForm assessmentId={assessment.id} existingFeedback={assessment.feedback} />
             </div>
 
             <div className="flex justify-between items-center mb-6">
