@@ -44,17 +44,21 @@ export default function OnboardingForm({ industries }) {
     const skillsParam = searchParams.get("skills");
 
     if (industryParam) {
-      // Try to find matching industry
+      // Try to find matching industry by subindustry
       const foundIndustry = industries.find(ind => ind.subIndustries.includes(industryParam));
       if (foundIndustry) {
-        setValue("industry", `${foundIndustry.id}-${industryParam}`);
+        setValue("industry", foundIndustry.id);
         setSelectedIndustry(foundIndustry);
+        // Set a small timeout to allow industry to settle before setting subIndustry
+        setTimeout(() => {
+          setValue("subIndustry", industryParam);
+        }, 50);
       } else {
         // Fallback: try to match main industry name
         const mainIndustry = industries.find(ind => ind.name === industryParam);
         if (mainIndustry) {
+          setValue("industry", mainIndustry.id);
           setSelectedIndustry(mainIndustry);
-          // We can't select a sub-industry yet, user must do it
         }
       }
     }
@@ -108,13 +112,14 @@ export default function OnboardingForm({ industries }) {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="industry">Industry</Label>
+              <Label htmlFor="industry">Industry <span className="text-red-500">*</span></Label>
               <Select
                 onValueChange={(value) => {
                   setValue("industry", value);
                   setSelectedIndustry(industries.find((ind) => ind.id === value));
                   setValue("subIndustry", "");
                 }}
+                value={watchIndustry}
               >
                 <SelectTrigger id="industry">
                   <SelectValue placeholder="Select an industry" />
@@ -132,8 +137,11 @@ export default function OnboardingForm({ industries }) {
 
             {watchIndustry && (
               <div className="space-y-2">
-                <Label htmlFor="subIndustry">Specialization</Label>
-                <Select onValueChange={(value) => setValue("subIndustry", value)}>
+                <Label htmlFor="subIndustry">Specialization <span className="text-red-500">*</span></Label>
+                <Select
+                  onValueChange={(value) => setValue("subIndustry", value)}
+                  value={watch("subIndustry")}
+                >
                   <SelectTrigger id="subIndustry">
                     <SelectValue placeholder="Select your specialization" />
                   </SelectTrigger>
@@ -150,7 +158,7 @@ export default function OnboardingForm({ industries }) {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="experience">Years of Experience</Label>
+              <Label htmlFor="experience">Years of Experience <span className="text-red-500">*</span></Label>
               <Input
                 id="experience"
                 type="number"
@@ -163,29 +171,29 @@ export default function OnboardingForm({ industries }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
+              <Label htmlFor="country">Country <span className="text-red-500">*</span></Label>
               <Input
                 id="country"
                 placeholder="e.g., United States, India, United Kingdom"
                 {...register("country")}
               />
-              <p className="text-xs text-muted-foreground">Optional - helps find local internships</p>
+              <p className="text-xs text-muted-foreground">Helps find local internships</p>
               {errors.country && <p className="text-sm text-red-500">{errors.country.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
+              <Label htmlFor="city">City <span className="text-red-500">*</span></Label>
               <Input
                 id="city"
                 placeholder="e.g., New York, Bangalore, London"
                 {...register("city")}
               />
-              <p className="text-xs text-muted-foreground">Optional - helps find local internships</p>
+              <p className="text-xs text-muted-foreground">Helps find local internships</p>
               {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="skills">Skills</Label>
+              <Label htmlFor="skills">Skills <span className="text-red-500">*</span></Label>
               <Input
                 id="skills"
                 placeholder="e.g., Python, JavaScript, Project Management"
@@ -215,7 +223,7 @@ export default function OnboardingForm({ industries }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bio">Professional Bio</Label>
+              <Label htmlFor="bio">Professional Bio <span className="text-red-500">*</span></Label>
               <Textarea
                 id="bio"
                 placeholder="Tell us about your professional background..."

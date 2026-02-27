@@ -6,7 +6,7 @@ export default async function SelectionPage() {
   const user = await getUser();
 
   if (user?.userType === "EXPERIENCED") {
-    redirect("/onboarding");
+    redirect("/onboarding/resume-upload");
   }
 
   if (user?.userType === "FRESHER") {

@@ -2,19 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Briefcase, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { updateUserType } from "@/actions/user";
-
-const userTypeSchema = z.object({
-    type: z.enum(["EXPERIENCED", "FRESHER"]),
-});
 
 export default function SelectionForm() {
     const router = useRouter();
@@ -25,7 +17,7 @@ export default function SelectionForm() {
         try {
             await updateUserType(type);
             if (type === "EXPERIENCED") {
-                router.push("/onboarding");
+                router.push("/onboarding/resume-upload");
             } else {
                 router.push("/onboarding/assessment");
             }
@@ -76,7 +68,7 @@ export default function SelectionForm() {
                         </p>
                     </div>
                     <Button disabled={loading} variant="outline" className="w-full mt-4 group-hover:bg-primary group-hover:text-primary-foreground">
-                        Select Path
+                        Upload Resume
                     </Button>
                 </CardContent>
             </Card>

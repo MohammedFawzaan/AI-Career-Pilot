@@ -41,7 +41,11 @@ export default function RoleCard({ role, index, analysis, selectedRole }) {
             const skills = analysis.identifiedSkills?.length > 0
                 ? analysis.identifiedSkills.join(",")
                 : analysis.skillGap.map(s => s.skill).join(",");
-            const bio = `I am aspiring to be a ${role.role}. ${analysis.summary}`;
+
+            const isExperienced = analysis.userType === "EXPERIENCED";
+            const bio = isExperienced
+                ? `I am an experienced professional looking to grow into ${role.role}. ${analysis.summary}`
+                : `I am aspiring to be a ${role.role}. ${analysis.summary}`;
 
             router.push(`/onboarding?industry=${encodeURIComponent(industry)}&skills=${encodeURIComponent(skills)}&bio=${encodeURIComponent(bio)}&selectedRole=${encodeURIComponent(role.role)}`);
         } catch (error) {

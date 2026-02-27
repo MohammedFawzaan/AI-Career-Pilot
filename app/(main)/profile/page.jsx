@@ -1,4 +1,3 @@
-
 import { getUser } from "@/actions/user";
 import { industries } from "@/data/industries";
 import ProfileForm from "./_components/profile-form";

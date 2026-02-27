@@ -4,7 +4,7 @@ import { getUser } from "@/actions/user";
 import { db } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Trophy, Target, BookOpen, Lightbulb, RefreshCw } from "lucide-react";
+import { CheckCircle2, Trophy, Target, BookOpen, Lightbulb, RefreshCw, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import RoleCard from "./_components/role-card";
 import CountryRecommendations from "./_components/country-recommendations";
@@ -26,6 +26,7 @@ export default async function AssessmentResultPage() {
     }
 
     const { analysis } = assessment;
+    const isExperienced = analysis.userType === "EXPERIENCED";
 
     return (
         <main className="container mx-auto px-4 py-8 max-w-5xl">
@@ -34,7 +35,9 @@ export default async function AssessmentResultPage() {
                     Your Career Blueprint
                 </h1>
                 <p className="text-muted-foreground text-lg mx-auto">
-                    Based on your unique traits, we've designed a personalized career path for you.
+                    {isExperienced
+                        ? "Based on your resume and validation, here are your personalized growth opportunities."
+                        : "Based on your unique traits, we've designed a personalized career path for you."}
                 </p>
             </div>
 
@@ -52,11 +55,43 @@ export default async function AssessmentResultPage() {
                     </CardHeader>
                 </Card>
 
-                {/* Top 3 Recommended Roles */}
+                {/* Validation Score (Experienced users only) */}
+                {isExperienced && analysis.validationScore && (
+                    <Card className="col-span-full border-green-500/20 bg-green-50/30 dark:bg-green-950/10">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <ShieldCheck className="h-5 w-5 text-green-500" />
+                                Resume Validation Score
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.skillAuthenticity}%</p>
+                                    <p className="text-xs text-muted-foreground">Skill Authenticity</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.practicalAbility}%</p>
+                                    <p className="text-xs text-muted-foreground">Practical Ability</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.crossSkillReasoning}%</p>
+                                    <p className="text-xs text-muted-foreground">Cross-Skill</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.confidenceAlignment}%</p>
+                                    <p className="text-xs text-muted-foreground">Confidence</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Top Recommended / Future Growth Roles */}
                 <div className="col-span-full space-y-4">
                     <h2 className="text-2xl font-bold flex items-center gap-2">
                         <Target className="h-6 w-6 text-blue-500" />
-                        Top Recommended Roles
+                        {isExperienced ? "Future Growth Roles" : "Top Recommended Roles"}
                     </h2>
                     <div className="grid md:grid-cols-3 gap-6">
                         {analysis.recommendedRoles.map((role, index) => (
@@ -129,8 +164,8 @@ export default async function AssessmentResultPage() {
 
             <div className="flex justify-between items-center mb-6">
                 <Button asChild variant="outline">
-                    <Link href="/onboarding/assessment">
-                        <RefreshCw className="mr-2 h-4 w-4" /> Retake Assessment
+                    <Link href={isExperienced ? "/onboarding/resume-upload" : "/onboarding/assessment"}>
+                        <RefreshCw className="mr-2 h-4 w-4" /> {isExperienced ? "Re-upload Resume" : "Retake Assessment"}
                     </Link>
                 </Button>
             </div>

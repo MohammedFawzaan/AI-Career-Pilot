@@ -3,16 +3,15 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import Header from "@/components/header";
+import NavigationProgress from "@/components/navigation-progress";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "AI Career Pilot",
-  description: "",
+  description: "AI Career Coach design for users professional success",
 };
-
-export const dynamic = "force-dynamic";
 
 export default function RootLayout({ children }) {
   return (
@@ -23,7 +22,7 @@ export default function RootLayout({ children }) {
     >
       <html lang="en" suppressHydrationWarning>
         <head>
-          <link rel="icon" href="/logo.png" sizes="any" />
+          <link rel="icon" href="/logo.jpeg" sizes="any" />
         </head>
         <body className={`${inter.className}`}>
           <ThemeProvider
@@ -32,6 +31,7 @@ export default function RootLayout({ children }) {
             enableSystem
             disableTransitionOnChange
           >
+            <NavigationProgress />
             <Header />
             <main className="min-h-screen">{children}</main>
             <Toaster richColors />

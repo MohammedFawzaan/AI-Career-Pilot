@@ -7,7 +7,7 @@ export const onboardingSchema = z.object({
   subIndustry: z.string({
     required_error: "Please select a specialization",
   }),
-  bio: z.string().max(500).optional(),
+  bio: z.string().min(10, "Bio must be at least 10 characters long"),
   experience: z
     .string()
     .transform((val) => parseInt(val, 10))
@@ -24,9 +24,11 @@ export const onboardingSchema = z.object({
         .map((skill) => skill.trim())
         .filter(Boolean)
       : undefined
-  ),
-  country: z.string().optional(),
-  city: z.string().optional(),
+  ).refine((skills) => skills && skills.length > 0, {
+    message: "At least one skill is required",
+  }),
+  country: z.string().min(2, "Country is required"),
+  city: z.string().min(2, "City is required"),
 });
 
 export const contactSchema = z.object({
