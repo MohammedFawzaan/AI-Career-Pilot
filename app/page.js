@@ -19,6 +19,7 @@ import {
 import HeroSection from "@/components/hero";
 import { howItWorks } from "@/data/howItWorks";
 import { features } from "@/data/features";
+import { CTAButton } from "@/components/cta-button";
 
 export default function LandingPage() {
   return (
@@ -252,14 +253,7 @@ export default function LandingPage() {
               placement and professional growth.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/onboarding" passHref>
-                <Button
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 px-8 py-6 text-base font-bold animate-bounce"
-                >
-                  Now <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <CTAButton />
             </div>
           </div>
         </div>

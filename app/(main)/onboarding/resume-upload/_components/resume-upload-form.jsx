@@ -117,7 +117,10 @@ export default function ResumeUploadForm() {
         }
     };
 
+    const [isRedirecting, setIsRedirecting] = useState(false);
+
     const handleConfirmAndContinue = () => {
+        setIsRedirecting(true);
         // Store extracted data in sessionStorage for the validation page
         sessionStorage.setItem("extractedResume", JSON.stringify(extractedData));
         router.replace("/onboarding/resume-validation");
@@ -365,9 +368,23 @@ export default function ResumeUploadForm() {
             </CardContent>
 
             <CardFooter className="flex flex-col gap-3 border-t pt-4">
-                <Button onClick={handleConfirmAndContinue} className="w-full" size="lg">
-                    Confirm & Start Validation
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                <Button
+                    onClick={handleConfirmAndContinue}
+                    className="w-full"
+                    size="lg"
+                    disabled={isRedirecting}
+                >
+                    {isRedirecting ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Redirecting to Validation...
+                        </>
+                    ) : (
+                        <>
+                            Confirm & Start Validation
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </>
+                    )}
                 </Button>
                 <Button onClick={handleReset} variant="ghost" className="w-full">
                     <RefreshCw className="mr-2 h-4 w-4" />

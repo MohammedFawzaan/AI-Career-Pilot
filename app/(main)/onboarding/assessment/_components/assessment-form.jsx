@@ -152,11 +152,13 @@ export default function AssessmentForm() {
             if (result) {
                 toast.success("Assessment completed!");
                 router.replace("/onboarding/career-path");
+                // Keep loading true for transition
+            } else {
+                setLoading(false);
             }
         } catch (error) {
             console.error(error);
             toast.error("Failed to submit assessment. Please try again.");
-        } finally {
             setLoading(false);
         }
     }

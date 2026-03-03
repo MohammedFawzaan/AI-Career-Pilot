@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const HeroSection = () => {
   const imageRef = useRef(null);
@@ -25,6 +27,14 @@ const HeroSection = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const [isNavigating, setIsNavigating] = React.useState(false);
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    setIsNavigating(true);
+    router.push("/onboarding/career-path");
+  };
+
   return (
     <section className="w-full pt-36 md:pt-48 pb-10 relative overflow-hidden">
       <div className="space-y-6 text-center">
@@ -46,11 +56,21 @@ const HeroSection = () => {
           </p>
         </div>
         <div className="flex justify-center space-x-4">
-          <Link href="/onboarding/career-path">
-            <Button size="lg" className="px-8 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200">
-              Get Started
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            className="px-8 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200"
+            onClick={handleGetStarted}
+            disabled={isNavigating}
+          >
+            {isNavigating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Planning Your Path...
+              </>
+            ) : (
+              "Get Started"
+            )}
+          </Button>
           <Link href="#features">
             <Button size="lg" variant="outline" className="px-8">
               Explore Features

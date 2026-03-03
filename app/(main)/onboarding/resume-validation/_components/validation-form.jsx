@@ -165,11 +165,13 @@ export default function ValidationForm() {
                 sessionStorage.removeItem("extractedResume");
                 toast.success("Validation completed! Generating your career blueprint...");
                 router.replace("/onboarding/career-path");
+                // Don't setSubmitting(false) here to keep the loader visible during transition
+            } else {
+                setSubmitting(false);
             }
         } catch (error) {
             console.error(error);
             toast.error("Failed to submit validation. Please try again.");
-        } finally {
             setSubmitting(false);
         }
     };
