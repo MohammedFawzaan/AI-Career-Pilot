@@ -34,39 +34,47 @@ export async function generateValidationQuestions(extractedResume) {
         - Achievements: ${resumeSections.hasAchievements ? "YES" : "NONE"}
 
         CRITICAL DISTRIBUTION RULE:
-        Across ALL 11 questions, you MUST spread them across the resume sections as follows:
-        - Maximum 3 questions may reference ONLY projects
-        - At least 3 questions must focus on SKILLS directly (independent of any project)
-        - If WORK EXPERIENCE is available: at least 2 questions must reference specific jobs/companies/responsibilities
-        - If NO WORK EXPERIENCE is listed: replace the experience-based questions with additional SKILL or PROJECT questions
-        - Remaining questions can combine any available sections
-        Do NOT make most questions about projects. The assessment must cover the FULL resume.
+        - Layer 1: ALL questions MUST be about SKILLS ONLY — to verify whether the skills listed are genuine
+        - Layer 2: ALL questions MUST be about PROJECTS and WORK EXPERIENCE — to check practical ability
+        - Layer 3: Questions MUST cross-verify whether the EXPERIENCE or PROJECTS mentioned are authentic
+        - Layer 4: Reflective and forward-looking career questions
+        Do NOT mix layers — each layer has a specific verification purpose.
 
         LAYER 1 — Resume Skill Validation (exactly 3 questions):
-        - Question 1: Target a top technical SKILL directly — ask about how they've used it across their career (not just one project).
+        PURPOSE: Verify whether the SKILLS listed on the resume are GENUINE. All 3 questions MUST be about specific skills.
+        - Question 1: Pick a top skill from the resume and ask how they've used it — test depth of knowledge.
           Example: "You list [Skill] on your resume. Can you describe the most complex problem you've solved using it?"
-        - Question 2: Target their WORK EXPERIENCE — ask about a specific role, responsibility, or achievement at a company.
-          Example: "At [Company Name], what was your primary responsibility, and what was the most significant outcome you delivered?"
-        - Question 3: Target a SECOND SKILL from the resume — how they've applied or deepened that skill across their work or personal builds.
-          Example: "You have [Skill] listed on your resume. Can you walk me through a real situation where you applied it independently?"
+        - Question 2: Pick a second skill and ask a scenario question — test whether they can apply it under real conditions.
+          Example: "If you were given a task that required [Skill], what would be your step-by-step approach?"
+        - Question 3: Pick a third skill and ask about challenges — test whether they've genuinely worked with it.
+          Example: "What's the hardest challenge you've faced while working with [Skill], and how did you overcome it?"
+        Do NOT ask about projects or experience in this layer — ONLY skills.
 
-        LAYER 2 — Practical Ability Check (exactly 3 questions):
-        - Question 1: A scenario based on their WORK EXPERIENCE — how they handled a real workplace situation.
-          Example: "In your role at [Company], how did you handle [type of challenge like deadlines, team conflict, technical debt]?"
-        - Question 2: A scenario based on their SKILLS — how they'd approach a technical problem.
-          Example: "If you had to choose between [Skill A] and [Skill B] for a given scenario, how would you decide?"
-        - Question 3: This one may reference a specific PROJECT if the resume has one — otherwise use experience.
-          Example: "Walk me through a critical decision you made during [Project/Role] and what the outcome was."
+        LAYER 2 — Practical Ability Check (exactly 4 questions):
+        PURPOSE: Verify practical ability through PROJECTS and WORK EXPERIENCE.
+        DISTRIBUTION RULES:
+        - If resume has BOTH Projects AND Work Experience: ask 2 questions about Projects + 2 about Work Experience
+        - If resume has Projects but NO Work Experience: ask all 4 questions about Projects
+        - If resume has Work Experience but NO Projects: ask all 4 questions about Work Experience
+        - If resume has NEITHER Projects NOR Work Experience: ask 4 questions about Skills application and Certificates
 
-        LAYER 3 — Cross-Skill Reasoning (exactly 3 questions):
-        - Generate 3 questions that combine SKILLS + EXPERIENCE or SKILLS + PROJECTS together.
-        - At most 1 of these 3 may be purely project-focused.
-        - Each question must test how their skills WORK TOGETHER across their career, not just one project.
-        - Example: "You have experience in [Skill A] and [Skill B]. In your work at [Company/Project], how did these two complement each other?"
-        - Example: "How does your knowledge of [Skill] influence how you approach [broader responsibility from their experience]?"
+        Project questions should verify the user built what they claim:
+          Example: "In your [Project Name], what was the biggest technical challenge and how did you solve it?"
+          Example: "Walk me through the architecture of [Project Name]. Why did you choose that approach?"
+        Work Experience questions should verify workplace contributions:
+          Example: "At [Company], what was a specific outcome you personally delivered?"
+          Example: "Describe a real challenge you faced in your role at [Company] and how you handled it."
+
+        LAYER 3 — Cross-Skill Reasoning (exactly 2 questions):
+        PURPOSE: Cross-verify whether the EXPERIENCE or PROJECTS mentioned are REAL — not copied or fabricated.
+        - Question 1: Combine a SKILL with a PROJECT or EXPERIENCE — ask how they used the skill IN that specific context. If the user truly did the work, they'll answer naturally.
+          Example: "You used [Skill A] in [Project/Company]. Can you explain a specific decision you made using that skill in that context?"
+        - Question 2: Ask a deeper follow-up that only someone who ACTUALLY did the work would know.
+          Example: "In [Project/Role], what would you do differently if you had to rebuild it from scratch, and why?"
+        These questions should feel like a natural conversation but are designed to catch fabrication.
 
         LAYER 4 — Role Suitability & Confidence Mapping (exactly 2 questions):
-        - Question 1: Reflective — based on their OVERALL CAREER (skills + experience combined).
+        - Question 1: Reflective — based on their OVERALL CAREER (skills + experience + projects combined).
           Example: "Across all your work experience and projects, which skill or role responsibility do you feel most confident applying professionally?"
         - Question 2: Forward-looking — based on their BACKGROUND.
           Example: "Given your background in [field], what type of work environment or role do you see yourself thriving in next?"
@@ -82,12 +90,12 @@ export async function generateValidationQuestions(extractedResume) {
                 {
                     "id": "practical-check",
                     "name": "Practical Ability Check",
-                    "questions": ["Question 1", "Question 2", "Question 3"]
+                    "questions": ["Question 1", "Question 2", "Question 3", "Question 4"]
                 },
                 {
                     "id": "cross-skill",
                     "name": "Cross-Skill Reasoning",
-                    "questions": ["Question 1", "Question 2", "Question 3"]
+                    "questions": ["Question 1", "Question 2"]
                 },
                 {
                     "id": "role-suitability",
@@ -99,14 +107,16 @@ export async function generateValidationQuestions(extractedResume) {
 
         IMPORTANT:
         - Questions must be personalized based on the ACTUAL content of the resume
-        - SPREAD questions across Skills, Work Experience, and Projects — do NOT focus only on projects
-        - Reference specific skill names, job titles, company names, and technologies from the resume
+        - Layer 1: ONLY about skills — verify genuineness, NOT projects or experience
+        - Layer 2: ONLY about projects and work experience — verify practical ability
+        - Layer 3: Cross-verify project/experience authenticity — catch fabrication
+        - Reference specific skill names, project names, job titles, company names from the resume
         - Do NOT ask about education or academic background
         - Do NOT use generic placeholder questions
         - Keep all questions concise, professional, and conversational
-        - Total: exactly 11 questions
-        - If NO work experience: replace all experience questions with additional skill-depth or project questions
-        - If NO projects: replace all project references with experience or skill-based questions
+        - Total: exactly 11 questions (3 + 4 + 2 + 2)
+        - If NO work experience: replace experience questions with project or skill questions
+        - If NO projects: replace project questions with experience or skill questions
     `;
 
     try {
@@ -161,7 +171,9 @@ export async function submitResumeValidation(resumeData, validationAnswers) {
             - patternGame traits (abstraction, anomalyDetection, optimization)
             - personaGame bigFive traits (openness, conscientiousness, extraversion, agreeableness, neuroticism)
 
-            Use the following industry list as a reference:
+            Map their verified skills, validated experience, and cognitive profile to the most suitable industries and roles — NOT limited to IT.
+            Consider ANY industry or career path that fits their profile (e.g., healthcare, finance, education, creative arts, engineering, business, etc.).
+            Use the following industry list as a reference, but feel free to suggest industries OUTSIDE this list if they are a better fit:
             ${JSON.stringify(industries.map(i => ({ name: i.name, sub: i.subIndustries })))}
 
             Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):

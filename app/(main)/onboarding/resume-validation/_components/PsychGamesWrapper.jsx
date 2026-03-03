@@ -12,7 +12,7 @@ import { AlertTriangle, Brain, MessageSquare, ChevronRight, Loader2, Sparkles, T
 
 const GAMES_META = [
     { id: "decisionGame", title: "Decision Under Pressure", icon: AlertTriangle, iconColor: "text-orange-400", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20", gradientFrom: "from-orange-500/20", gradientTo: "to-orange-500/5", tagline: "How do you react when things go wrong?", description: "3 rapid career crisis scenarios. Pick 2 actions per scenario. Be honest — there are no wrong answers.", duration: "~2 mins", tests: ["Risk Tolerance", "Leadership Style", "Ethical Reasoning"] },
-    { id: "patternGame", title: "Pattern Hunter", icon: Brain, iconColor: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", gradientFrom: "from-blue-500/20", gradientTo: "to-blue-500/5", tagline: "How does your brain solve problems?", description: "3 quick cognitive puzzles: sequences, flowchart bugs, and data anomalies. 60 seconds per round.", duration: "~2 mins", tests: ["Logical Abstraction", "Bug Detection", "Optimization Thinking"] },
+    { id: "patternGame", title: "Pattern Hunter", icon: Brain, iconColor: "text-blue-400", bgColor: "bg-blue-500/10", borderColor: "border-blue-500/20", gradientFrom: "from-blue-500/20", gradientTo: "to-blue-500/5", tagline: "How does your brain solve problems?", description: "6 rounds: 3 logic puzzles + 3 career-based challenges. 60 seconds per round.", duration: "~4 mins", tests: ["Pattern Recognition", "Bug Detection", "Career Prioritization", "Decision Clarity"] },
     { id: "personaGame", title: "Hidden Persona", icon: MessageSquare, iconColor: "text-purple-400", bgColor: "bg-purple-500/10", borderColor: "border-purple-500/20", gradientFrom: "from-purple-500/20", gradientTo: "to-purple-500/5", tagline: "How do you show up for your team?", description: "3 short workplace chat scenarios. Pick how you'd genuinely respond.", duration: "~1 min", tests: ["Openness", "Conscientiousness", "Team Dynamics"] },
 ];
 
@@ -216,6 +216,8 @@ export default function PsychGamesWrapper({ resumeData, validationAnswers, onCom
             { label: "Risk Appetite", value: decisionGame?.traits?.riskAppetite || 50, color: "bg-red-400" },
             { label: "Pattern Recognition", value: patternGame?.traits?.abstraction || 50, color: "bg-blue-400" },
             { label: "Bug Detection", value: patternGame?.traits?.anomalyDetection || 50, color: "bg-cyan-400" },
+            { label: "Career Prioritization", value: patternGame?.traits?.prioritization || 50, color: "bg-amber-400" },
+            { label: "Decision Clarity", value: patternGame?.traits?.decisionClarity || 50, color: "bg-emerald-400" },
             { label: "Empathy & Agreeableness", value: personaGame?.bigFive?.A || 50, color: "bg-purple-400" },
             { label: "Conscientiousness", value: personaGame?.bigFive?.C || 50, color: "bg-green-400" },
         ];

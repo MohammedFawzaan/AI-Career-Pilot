@@ -1,4 +1,3 @@
-
 import { redirect } from "next/navigation";
 import { getUser } from "@/actions/user";
 import { db } from "@/lib/prisma";
@@ -59,6 +58,38 @@ export default async function AssessmentResultPage() {
                     </CardHeader>
                 </Card>
 
+                {/* Validation Score (Experienced users only) */}
+                {isExperienced && analysis.validationScore && (
+                    <Card className="col-span-full border-green-500/20 bg-green-50/30 dark:bg-green-950/10">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <ShieldCheck className="h-5 w-5 text-green-500" />
+                                Resume Validation Score
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.skillAuthenticity}%</p>
+                                    <p className="text-xs text-muted-foreground">Skill Authenticity</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.practicalAbility}%</p>
+                                    <p className="text-xs text-muted-foreground">Practical Ability</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.crossSkillReasoning}%</p>
+                                    <p className="text-xs text-muted-foreground">Cross-Skill</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.confidenceAlignment}%</p>
+                                    <p className="text-xs text-muted-foreground">Confidence</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Psychological Stats Card */}
                 {psychStats && (
                     <Card className="col-span-full border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5">
@@ -98,6 +129,8 @@ export default async function AssessmentResultPage() {
                                     { label: "Risk Appetite", value: traits.decisionGame?.traits?.riskAppetite || 50, color: "bg-red-400" },
                                     { label: "Pattern Recognition", value: traits.patternGame?.traits?.abstraction || 50, color: "bg-blue-400" },
                                     { label: "Bug Detection", value: traits.patternGame?.traits?.anomalyDetection || 50, color: "bg-cyan-400" },
+                                    { label: "Career Prioritization", value: traits.patternGame?.traits?.prioritization || 50, color: "bg-amber-400" },
+                                    { label: "Decision Clarity", value: traits.patternGame?.traits?.decisionClarity || 50, color: "bg-emerald-400" },
                                     { label: "Empathy", value: traits.personaGame?.bigFive?.A || 50, color: "bg-purple-400" },
                                     { label: "Conscientiousness", value: traits.personaGame?.bigFive?.C || 50, color: "bg-green-400" },
                                 ];
@@ -120,38 +153,6 @@ export default async function AssessmentResultPage() {
                                     </div>
                                 );
                             })()}
-                        </CardContent>
-                    </Card>
-                )}
-
-                {/* Validation Score (Experienced users only) */}
-                {isExperienced && analysis.validationScore && (
-                    <Card className="col-span-full border-green-500/20 bg-green-50/30 dark:bg-green-950/10">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-lg">
-                                <ShieldCheck className="h-5 w-5 text-green-500" />
-                                Resume Validation Score
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.skillAuthenticity}%</p>
-                                    <p className="text-xs text-muted-foreground">Skill Authenticity</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.practicalAbility}%</p>
-                                    <p className="text-xs text-muted-foreground">Practical Ability</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.crossSkillReasoning}%</p>
-                                    <p className="text-xs text-muted-foreground">Cross-Skill</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-primary">{analysis.validationScore.confidenceAlignment}%</p>
-                                    <p className="text-xs text-muted-foreground">Confidence</p>
-                                </div>
-                            </div>
                         </CardContent>
                     </Card>
                 )}

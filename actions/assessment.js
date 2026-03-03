@@ -85,8 +85,9 @@ export async function submitAssessment(fullProfile) {
             6. Current Status & Satisfaction
             7. Psychological profile and cognitive strengths from game scores
 
-            Map these traits to the most suitable IT industries and roles.
-            Use the following industry list as a reference: 
+            Map these traits to the most suitable industries and roles — NOT limited to IT.
+            Consider ANY industry or career path that fits their profile, skills, and ambitions (e.g., healthcare, finance, education, creative arts, engineering, business, etc.).
+            Use the following industry list as a reference, but feel free to suggest industries OUTSIDE this list if they are a better fit: 
             ${JSON.stringify(industries.map(i => ({ name: i.name, sub: i.subIndustries })))}
 
             Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):
