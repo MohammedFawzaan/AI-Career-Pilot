@@ -14,24 +14,24 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { assessmentLayers } from "@/data/assessmentDetails";
 import { toast } from "sonner";
 import { submitAssessment, generateNextQuestion } from "@/actions/assessment";
-import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, Send } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, Send, Brain } from "lucide-react";
+import PsychGamesWrapper from "./PsychGamesWrapper";
 
 export default function AssessmentForm() {
     const router = useRouter();
+    const [phase, setPhase] = useState("conversation"); // 'conversation' | 'psych-games' | 'submitting'
     const [currentLayerIndex, setCurrentLayerIndex] = useState(0);
     const [questionCountInLayer, setQuestionCountInLayer] = useState(0);
-    const [history, setHistory] = useState([]); // Stores all { layerId, question, answer }
+    const [history, setHistory] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState("");
     const [currentAnswer, setCurrentAnswer] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // For the optional input at end of layer
     const [showLayerInput, setShowLayerInput] = useState(false);
     const [layerInput, setLayerInput] = useState("");
 
@@ -45,11 +45,13 @@ export default function AssessmentForm() {
         }
     }, []);
 
-    // Progress: (Layers Completed * 4 + Questions in Current Layer) / (Total Layers * 4)
-    // Each layer has 4 questions (1 static + 3 dynamic)
+    // Progress: conversation = 0-75%, psych-games = 80%, submitting = 98%
     const totalQuestions = totalLayers * 4;
     const questionsAnswered = (currentLayerIndex * 4) + questionCountInLayer;
-    const progress = (questionsAnswered / totalQuestions) * 100;
+    const conversationProgress = (questionsAnswered / totalQuestions) * 75;
+    const progress = phase === "conversation" ? conversationProgress
+        : phase === "psych-games" ? 80
+            : 98;
 
     const handleAnswerSubmit = async () => {
         if (!currentAnswer.trim()) {
@@ -122,23 +124,34 @@ export default function AssessmentForm() {
             setShowLayerInput(false);
             setLayerInput("");
         } else {
-            // Final Submission
-            await finalSubmit([...history, ...(layerInput.trim() ? [{
+            // All layers done — move to psych games phase
+            const finalHistory = [...history, ...(layerInput.trim() ? [{
                 layerId: currentLayer.id,
                 question: "Additional Context",
                 answer: layerInput,
                 type: "optional"
-            }] : [])]);
+            }] : [])];
+            setHistory(finalHistory);
+            setPhase("psych-games");
         }
     };
 
-    const finalSubmit = async (finalData) => {
+    const handleGamesComplete = async (psychProfile) => {
+        setPhase("submitting");
+        await finalSubmit(history, psychProfile);
+    };
+
+    const finalSubmit = async (finalData, psychProfile = null) => {
         setLoading(true);
         try {
-            const result = await submitAssessment(finalData);
+            const dataWithPsych = psychProfile
+                ? [...finalData, { layerId: "psychProfile", question: "Psychological Game Results", answer: JSON.stringify(psychProfile), type: "psych" }]
+                : finalData;
+
+            const result = await submitAssessment(dataWithPsych);
             if (result) {
                 toast.success("Assessment completed!");
-                router.push("/onboarding/career-path");
+                router.replace("/onboarding/career-path");
             }
         } catch (error) {
             console.error(error);
@@ -163,6 +176,29 @@ export default function AssessmentForm() {
                 <p className="mt-4 text-muted-foreground">Initializing interview...</p>
             </div>
         )
+    }
+
+    // Psych Games Phase
+    if (phase === "psych-games") {
+        return (
+            <Card className="w-full max-w-2xl mx-auto shadow-lg">
+                <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                        <CardTitle className="text-2xl gradient-title flex items-center gap-2">
+                            <Brain className="h-6 w-6" /> Psychological Profile
+                        </CardTitle>
+                        <span className="text-sm text-muted-foreground">Phase 2 of 2</span>
+                    </div>
+                    <Progress value={80} className="h-2" />
+                    <CardDescription className="mt-2 text-base">
+                        3 quick mini-games to complete your profile. These help the AI understand how your mind works.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <PsychGamesWrapper history={history} onComplete={handleGamesComplete} />
+                </CardContent>
+            </Card>
+        );
     }
 
     return (

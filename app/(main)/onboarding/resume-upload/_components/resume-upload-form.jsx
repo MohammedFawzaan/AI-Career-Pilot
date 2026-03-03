@@ -120,7 +120,7 @@ export default function ResumeUploadForm() {
     const handleConfirmAndContinue = () => {
         // Store extracted data in sessionStorage for the validation page
         sessionStorage.setItem("extractedResume", JSON.stringify(extractedData));
-        router.push("/onboarding/resume-validation");
+        router.replace("/onboarding/resume-validation");
     };
 
     const handleReset = () => {

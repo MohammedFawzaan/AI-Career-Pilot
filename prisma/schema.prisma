@@ -37,46 +37,7 @@ model User {
   userType      UserType? // Enum to store if user is fresher or experienced
   careerAssessment CareerAssessment?
   careerRoadmap CareerRoadmap?
-}
-
-model Assessment {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  quizScore     Float     // Overall quiz score
-  questions     Json[]    // Array of {question, answer, userAnswer, isCorrect}
-  category      String    // "Technical", "Behavioral", etc.
-  improvementTip String?  // AI-generated improvement tip
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  @@index([userId])
-}
-
-model Resume {
-  id          String    @id @default(cuid())
-  userId      String    @unique    // One resume per user
-  user        User      @relation(fields: [userId], references: [id])
-  content     String    @db.Text // Markdown content
-  atsScore    Float?
-  feedback    String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model CoverLetter {
-  id              String    @id @default(cuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id])
-  content         String    // Markdown content
-  jobDescription  String?
-  companyName     String    // Name of the company applying to
-  jobTitle        String    // Position applying for
-  status          String    @default("draft") // draft, completed
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  @@index([userId])
+  psychologicalStats PsychologicalStats?
 }
 
 // Combined Industry Trends and Salary Insights
@@ -119,6 +80,7 @@ model CareerAssessment {
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   feedback              AssessmentFeedback?
+  psychologicalStats    PsychologicalStats?
 }
 
 model AssessmentFeedback {
@@ -142,4 +104,58 @@ model CareerRoadmap {
   progress          Json      // Track completed items
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+}
+
+model PsychologicalStats {
+  id                String             @id @default(cuid())
+  userId            String             @unique
+  user              User               @relation(fields: [userId], references: [id])
+  assessmentId      String?            @unique
+  assessment        CareerAssessment?  @relation(fields: [assessmentId], references: [id])
+  archetype         String             // e.g. "Systems Architect"
+  strength          String             // e.g. "Structured Abstraction"
+  riskProfile       String             // "Low", "Moderate", "High"
+  traitScores       Json               // Full trait breakdown from all 3 games
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model Assessment {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  quizScore     Float     // Overall quiz score
+  questions     Json[]    // Array of {question, answer, userAnswer, isCorrect}
+  category      String    // "Technical", "Behavioral", etc.
+  improvementTip String?  // AI-generated improvement tip
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Resume {
+  id          String    @id @default(cuid())
+  userId      String    @unique    // One resume per user
+  user        User      @relation(fields: [userId], references: [id])
+  content     String    @db.Text // Markdown content
+  atsScore    Float?
+  feedback    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model CoverLetter {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  content         String    // Markdown content
+  jobDescription  String?
+  companyName     String    // Name of the company applying to
+  jobTitle        String    // Position applying for
+  status          String    @default("draft") // draft, completed
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
 }

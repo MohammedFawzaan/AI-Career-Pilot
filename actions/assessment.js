@@ -1,6 +1,5 @@
 "use server";
 
-
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -14,16 +13,21 @@ export async function generateNextQuestion(currentLayer, history) {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `
-        You are an expert career counselor conducting an interview.
+        You are a warm, insightful career coach having a genuine conversation (not an exam).
         Current Topic: "${currentLayer.name}"
         Initial Question: "${currentLayer.initialQuestion}"
 
         Conversation History for this topic:
         ${JSON.stringify(history)}
 
-        Based on the user's previous answers, generate the NEXT single follow-up question to dig deeper into their "${currentLayer.name}".
-        The question should be concise, engaging, and relevant to their previous response.
-        Do NOT repeat questions.
+        Based on the user's previous answers, generate the NEXT single follow-up question.
+        
+        IMPORTANT RULES:
+        - Do NOT drill deeper into the same specific detail. Instead, PIVOT to a DIFFERENT, BROADER ANGLE of the topic.
+        - Keep the tone warm, curious, and conversational — like a career coach, not an interviewer.
+        - Ask open-ended questions that encourage reflection and self-discovery.
+        - Do NOT repeat questions or ask about something they already answered.
+        - The question should feel natural, like the next thing a thoughtful coach would ask.
         Return ONLY the question text.
     `;
 
@@ -61,39 +65,49 @@ export async function submitAssessment(fullProfile) {
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         const prompt = `
-            You are an expert career counselor. You have conducted a deep interview with a user to help them find their career path.
+            You are an expert career counselor and psychologist. You have conducted a deep interview with a user AND they completed 3 psychological mini-games.
             
             User Profile & Interview Details:
             ${JSON.stringify(fullProfile)}
 
-            Based ONLY on these interview inputs, analyze the user's:
+            A psychProfile from 3 psychological mini-games may be included in the data (type: 'psych').
+            If present, use its trait scores to enhance your analysis:
+            - decisionGame traits (analytical, riskAppetite, ethical, leadership, calmness)
+            - patternGame traits (abstraction, anomalyDetection, optimization)
+            - personaGame bigFive traits (openness, conscientiousness, extraversion, agreeableness, neuroticism)
+
+            Based on ALL these inputs, analyze the user's:
             1. Core Interests & Hobbies
             2. Skills (Soft & Hard)
             3. Achievements
             4. Career Goals
             5. Learning Ambitions
             6. Current Status & Satisfaction
+            7. Psychological profile and cognitive strengths from game scores
 
             Map these traits to the most suitable IT industries and roles.
-            Use the following industry list as a reference (but you can suggest specific roles within them): 
+            Use the following industry list as a reference: 
             ${JSON.stringify(industries.map(i => ({ name: i.name, sub: i.subIndustries })))}
 
             Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):
             {
                 "primaryProfile": "A 2-3 word catchphrase describing their profile (e.g., 'The Logical Architect')",
-                "summary": "A brief 2-sentence summary of why this profile fits them based on their answers.",
+                "summary": "A brief 2-sentence summary of why this profile fits them — reference both interview answers AND personality traits from game scores.",
+                "personalityArchetype": "A powerful archetype title based on game scores (e.g., 'Systems Architect', 'Risk-Driven Innovator', 'Empathetic Builder')",
+                "cognitiveStrength": "Their standout cognitive ability from game scores (e.g., 'Structured Abstraction', 'Anomaly Detection')",
+                "riskProfile": "Low / Moderate / High — derived from decisionGame riskAppetite score",
                 "recommendedIndustries": [
                     { "industry": "Name of Industry", "score": 85, "reason": "Why this industry fits their profile" }
                 ],
                 "recommendedRoles": [
-                    { "role": "Name of Role", "description": "Brief description", "matchReason": "Why this role fits specific traits" },
-                    { "role": "Second Best Role", "description": "Brief description", "matchReason": "Why this role fits specific traits" },
-                    { "role": "Third Best Role", "description": "Brief description", "matchReason": "Why this role fits specific traits" }
+                    { "role": "Name of Role", "description": "Brief description", "matchReason": "Why this role fits — reference verified skills AND personality/cognitive scores" },
+                    { "role": "Second Best Role", "description": "Brief description", "matchReason": "Why this role fits" },
+                    { "role": "Third Best Role", "description": "Brief description", "matchReason": "Why this role fits" }
                 ],
                 "recommendedCountries": [
-                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why this country has opportunities for these roles" },
-                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why this country has opportunities for these roles" },
-                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why this country has opportunities for these roles" }
+                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" },
+                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" },
+                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" }
                 ],
                 "identifiedSkills": [
                     "Skill 1 (User has)", "Skill 2 (User has)"
@@ -101,20 +115,21 @@ export async function submitAssessment(fullProfile) {
                 "recommendedSkills": [
                    "Skill 1 (To learn)", "Skill 2 (To learn)"
                 ],
-                // Deprecated but kept for compatibility if needed, or mapped from recommendedSkills
                 "skillGap": [
                     { "skill": "Skill Name", "priority": "High" } 
                 ],
                 "personalDevelopment": [
-                    "Advice 1 based on behavioral weak points", "Advice 2"
+                    "Advice 1 based on behavioral traits and game scores", "Advice 2"
                 ]
             }
             
             IMPORTANT:
-            - 'identifiedSkills': Extract skills the user *explicitly mentioned* or *demonstrated* in their answers.
-            - 'recommendedSkills': Suggest skills they *need* for the recommended roles but might lack.
-            - 'skillGap': same as recommendedSkills but with priority.
-            - 'recommendedCountries': Suggest 3-5 countries with high demand for the recommended roles, considering global job markets.
+            - 'identifiedSkills': Extract skills the user *explicitly mentioned* or *demonstrated*.
+            - 'recommendedSkills': Suggest skills they *need* for the recommended roles.
+            - 'personalityArchetype': Short, evocative title — not a generic label
+            - 'cognitiveStrength': Pick the single strongest trait from game scores
+            - 'riskProfile': Map riskAppetite: 0-40 = Low, 41-70 = Moderate, 71-100 = High
+            - 'recommendedCountries': Suggest 3-5 countries with high demand for the recommended roles.
         `;
 
         const result = await model.generateContent(prompt);

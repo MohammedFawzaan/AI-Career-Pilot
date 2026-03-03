@@ -10,10 +10,6 @@ export default async function ProfilePage() {
         redirect("/sign-in");
     }
 
-    if (!user.industry) {
-        redirect("/onboarding");
-    }
-
     return (
         <div className="mx-auto py-6">
             <ProfileForm industries={industries} initialData={user} />

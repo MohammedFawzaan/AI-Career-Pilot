@@ -12,46 +12,64 @@ export async function generateValidationQuestions(extractedResume) {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
+    const resumeSections = {
+        hasExperience: (extractedResume.experience?.length || 0) > 0,
+        hasProjects: (extractedResume.projects?.length || 0) > 0,
+        hasSkills: (extractedResume.skills?.length || 0) > 0,
+        hasEducation: (extractedResume.education?.length || 0) > 0,
+        hasAchievements: (extractedResume.achievements?.length || 0) > 0,
+    };
+
     const prompt = `
-        You are an expert career validator. Based on the following resume data, generate validation questions across 4 layers.
-        
+        You are an expert career validator. Based on the following resume data, generate BALANCED validation questions across 4 layers.
+
         Resume Data:
         ${JSON.stringify(extractedResume)}
 
-        Generate questions for these layers:
+        Available Resume Sections:
+        - Skills: ${resumeSections.hasSkills ? "YES" : "NONE"}
+        - Work Experience: ${resumeSections.hasExperience ? "YES" : "NONE"}
+        - Projects: ${resumeSections.hasProjects ? "YES" : "NONE"}
+        - Education: ${resumeSections.hasEducation ? "YES" : "NONE"}
+        - Achievements: ${resumeSections.hasAchievements ? "YES" : "NONE"}
+
+        CRITICAL DISTRIBUTION RULE:
+        Across ALL 11 questions, you MUST spread them across the resume sections as follows:
+        - Maximum 3 questions may reference ONLY projects
+        - At least 3 questions must focus on SKILLS directly (independent of any project)
+        - If WORK EXPERIENCE is available: at least 2 questions must reference specific jobs/companies/responsibilities
+        - If NO WORK EXPERIENCE is listed: replace the experience-based questions with additional SKILL or PROJECT questions
+        - Remaining questions can combine any available sections
+        Do NOT make most questions about projects. The assessment must cover the FULL resume.
 
         LAYER 1 — Resume Skill Validation (exactly 3 questions):
-        - Generate 1 general experience-based question per major skill (pick top 3 skills).
-        - Questions must focus on USAGE and EXPOSURE, not definitions.
-        - Reference specific PROJECTS from the resume where the skill was used.
-        - Keep them broad and professional.
-        - Example: "In your [Project Name] project, you used [skill]. Can you describe the specific challenges you faced with it?"
-        - Do NOT ask "What is [skill]?" or "Define [skill]"
+        - Question 1: Target a top technical SKILL directly — ask about how they've used it across their career (not just one project).
+          Example: "You list [Skill] on your resume. Can you describe the most complex problem you've solved using it?"
+        - Question 2: Target their WORK EXPERIENCE — ask about a specific role, responsibility, or achievement at a company.
+          Example: "At [Company Name], what was your primary responsibility, and what was the most significant outcome you delivered?"
+        - Question 3: Target a SECOND SKILL from the resume — how they've applied or deepened that skill across their work or personal builds.
+          Example: "You have [Skill] listed on your resume. Can you walk me through a real situation where you applied it independently?"
 
         LAYER 2 — Practical Ability Check (exactly 3 questions):
-        - Generate 3 general real-world situation questions.
-        - Reference the candidate's actual projects and work experience when framing scenarios.
-        - Focus on HOW the user approaches problems.
-        - Do not go deep into technical implementation details.
-        - Assess logical thinking and work approach.
-        - Example: "In a project like [Project Name], when you encounter a bug in production, what is your typical approach to debugging it?"
+        - Question 1: A scenario based on their WORK EXPERIENCE — how they handled a real workplace situation.
+          Example: "In your role at [Company], how did you handle [type of challenge like deadlines, team conflict, technical debt]?"
+        - Question 2: A scenario based on their SKILLS — how they'd approach a technical problem.
+          Example: "If you had to choose between [Skill A] and [Skill B] for a given scenario, how would you decide?"
+        - Question 3: This one may reference a specific PROJECT if the resume has one — otherwise use experience.
+          Example: "Walk me through a critical decision you made during [Project/Role] and what the outcome was."
 
         LAYER 3 — Cross-Skill Reasoning (exactly 3 questions):
-        - Generate 3 scenario-based questions that combine at least 2 skills from the resume.
-        - Use the candidate's ACTUAL PROJECTS as context for these scenarios.
-        - Each question must test whether the candidate understands how their skills WORK TOGETHER in real-world scenarios.
-        - Do NOT ask for definitions or deep theoretical explanations.
-        - Keep questions practical and high-level.
-        - Focus on how technologies interact, affect each other, or are used together in their projects.
-        - This layer separates real engineers from tutorial followers.
-        - Example: "In your [Project Name], you used [Tech A] and [Tech B] together. How did these technologies complement each other, and what tradeoffs did you face?"
+        - Generate 3 questions that combine SKILLS + EXPERIENCE or SKILLS + PROJECTS together.
+        - At most 1 of these 3 may be purely project-focused.
+        - Each question must test how their skills WORK TOGETHER across their career, not just one project.
+        - Example: "You have experience in [Skill A] and [Skill B]. In your work at [Company/Project], how did these two complement each other?"
+        - Example: "How does your knowledge of [Skill] influence how you approach [broader responsibility from their experience]?"
 
         LAYER 4 — Role Suitability & Confidence Mapping (exactly 2 questions):
-        - Ask 2 reflective questions.
-        - Identify the candidate's strongest skill area considering their project portfolio.
-        - Understand their preferred type of work (individual vs team, building vs maintaining, etc.)
-        - Check if their confidence aligns with their resume and project claims.
-        - Example: "Looking at your projects like [Project Name], which of your skills do you feel most confident applying in a professional setting, and why?"
+        - Question 1: Reflective — based on their OVERALL CAREER (skills + experience combined).
+          Example: "Across all your work experience and projects, which skill or role responsibility do you feel most confident applying professionally?"
+        - Question 2: Forward-looking — based on their BACKGROUND.
+          Example: "Given your background in [field], what type of work environment or role do you see yourself thriving in next?"
 
         Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):
         {
@@ -80,11 +98,15 @@ export async function generateValidationQuestions(extractedResume) {
         }
 
         IMPORTANT:
-        - Questions must be personalized based on the ACTUAL skills, projects, and experience in the resume
-        - Reference specific project names and technologies from the resume in your questions
+        - Questions must be personalized based on the ACTUAL content of the resume
+        - SPREAD questions across Skills, Work Experience, and Projects — do NOT focus only on projects
+        - Reference specific skill names, job titles, company names, and technologies from the resume
+        - Do NOT ask about education or academic background
         - Do NOT use generic placeholder questions
-        - Keep all questions concise and professional
+        - Keep all questions concise, professional, and conversational
         - Total: exactly 11 questions
+        - If NO work experience: replace all experience questions with additional skill-depth or project questions
+        - If NO projects: replace all project references with experience or skill-based questions
     `;
 
     try {
@@ -118,14 +140,14 @@ export async function submitResumeValidation(resumeData, validationAnswers) {
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         const prompt = `
-            You are an expert career analyst for experienced professionals.
+            You are an expert career analyst and psychologist for experienced professionals.
             
-            An experienced professional has uploaded their resume and completed a validation assessment.
-            Your job is to analyze their resume data AND their validation answers to:
+            An experienced professional has uploaded their resume, completed a validation assessment, AND played 3 psychological mini-games.
+            Your job is to analyze their resume data, validation answers, AND psychological game scores to:
             1. Verify the authenticity of their resume claims
             2. Identify their true skill level
             3. Recommend FUTURE GROWTH career roles (not their current role — they already have one)
-            4. Generate a comprehensive career analysis
+            4. Generate a comprehensive career analysis incorporating their cognitive and personality profile
 
             Resume Data:
             ${JSON.stringify(resumeData)}
@@ -133,13 +155,22 @@ export async function submitResumeValidation(resumeData, validationAnswers) {
             Validation Assessment Answers:
             ${JSON.stringify(validationAnswers)}
 
+            A psychProfile from 3 psychological mini-games may be included in the answers (type: 'psych').
+            If present, use its trait scores to enhance your analysis:
+            - decisionGame traits (analytical, riskAppetite, ethical, leadership, calmness)
+            - patternGame traits (abstraction, anomalyDetection, optimization)
+            - personaGame bigFive traits (openness, conscientiousness, extraversion, agreeableness, neuroticism)
+
             Use the following industry list as a reference:
             ${JSON.stringify(industries.map(i => ({ name: i.name, sub: i.subIndustries })))}
 
             Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):
             {
                 "primaryProfile": "A 2-3 word catchphrase describing their professional profile (e.g., 'The Systems Architect', 'The Data Strategist')",
-                "summary": "A brief 2-sentence summary analyzing their resume vs validation performance. Mention if skills are verified or if there are gaps.",
+                "summary": "A brief 2-sentence summary analyzing their resume vs validation performance AND personality traits from game scores.",
+                "personalityArchetype": "A powerful archetype title based on game scores (e.g., 'Systems Architect', 'Risk-Driven Innovator', 'Empathetic Builder')",
+                "cognitiveStrength": "Their standout cognitive ability from game scores (e.g., 'Structured Abstraction', 'Anomaly Detection')",
+                "riskProfile": "Low / Moderate / High — derived from decisionGame riskAppetite score",
                 "validationScore": {
                     "overall": 85,
                     "skillAuthenticity": 90,
@@ -151,12 +182,12 @@ export async function submitResumeValidation(resumeData, validationAnswers) {
                     { "industry": "Name of Industry", "score": 85, "reason": "Why this industry fits their growth trajectory" }
                 ],
                 "recommendedRoles": [
-                    { "role": "Future Growth Role 1", "description": "Brief description", "matchReason": "Why this role is a strong next step based on their verified skills" },
+                    { "role": "Future Growth Role 1", "description": "Brief description", "matchReason": "Why this role fits — reference verified skills AND personality/cognitive scores" },
                     { "role": "Future Growth Role 2", "description": "Brief description", "matchReason": "Why this role fits" },
                     { "role": "Future Growth Role 3", "description": "Brief description", "matchReason": "Why this role fits" }
                 ],
                 "recommendedCountries": [
-                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why this country has opportunities for these growth roles" },
+                    { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" },
                     { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" },
                     { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" }
                 ],
@@ -170,7 +201,7 @@ export async function submitResumeValidation(resumeData, validationAnswers) {
                     { "skill": "Skill Name", "priority": "High" }
                 ],
                 "personalDevelopment": [
-                    "Growth advice 1 based on validation performance", "Advice 2"
+                    "Growth advice 1 based on validation performance and game scores", "Advice 2"
                 ],
                 "resumeAuthenticity": "Verified/Partially Verified/Needs Review",
                 "currentStrengths": ["Strength 1 confirmed by validation", "Strength 2"],
@@ -179,9 +210,12 @@ export async function submitResumeValidation(resumeData, validationAnswers) {
 
             IMPORTANT:
             - 'recommendedRoles' should be FUTURE GROWTH roles, not their current position
-            - 'identifiedSkills': Skills VERIFIED through validation answers (they actually demonstrated knowledge)
+            - 'identifiedSkills': Skills VERIFIED through validation answers
             - 'recommendedSkills': Skills they need for future growth roles
-            - 'validationScore': Rate each area 0-100 based on how well they performed in validation
+            - 'personalityArchetype': Short, evocative title — not generic
+            - 'cognitiveStrength': Pick the single strongest trait from game scores
+            - 'riskProfile': Map riskAppetite: 0-40 = Low, 41-70 = Moderate, 71-100 = High
+            - 'validationScore': Rate each area 0-100
             - 'resumeAuthenticity': Overall assessment of resume truthfulness
             - 'recommendedCountries': Suggest 3-5 countries with demand for their growth roles
             - If validation answers were weak for a claimed skill, note it in 'areasOfConcern'

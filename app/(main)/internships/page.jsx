@@ -10,10 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default async function InternshipsPage() {
     const user = await getUser();
     if (!user) redirect("/sign-in");
-
-    if (!user.userType) {
-        redirect("/onboarding/selection");
-    }
+    if (!user?.userType) redirect("/onboarding/selection");
 
     let internshipsData = { local: [], remote: [], userLocation: null };
     let certificates = [];

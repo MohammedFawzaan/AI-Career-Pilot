@@ -16,24 +16,25 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { resumeValidationLayers } from "@/data/resumeValidationLayers";
 import { generateValidationQuestions, submitResumeValidation } from "@/actions/resume-validation";
-import { Loader2, Send, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Loader2, Send, ArrowRight, CheckCircle2, Brain } from "lucide-react";
+import PsychGamesWrapper from "./PsychGamesWrapper";
 
 export default function ValidationForm() {
     const router = useRouter();
-    const [loading, setLoading] = useState(true); // Start loading (fetch questions)
+    const [phase, setPhase] = useState("questions"); // 'questions' | 'psych-games' | 'submitting'
+    const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [questions, setQuestions] = useState(null); // AI-generated questions by layer
+    const [questions, setQuestions] = useState(null);
     const [resumeData, setResumeData] = useState(null);
 
-    // Current position tracking
     const [currentLayerIndex, setCurrentLayerIndex] = useState(0);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [currentAnswer, setCurrentAnswer] = useState("");
-    const [answers, setAnswers] = useState([]); // Array of { layerId, question, answer }
+    const [answers, setAnswers] = useState([]);
 
-    // Layer completion optional input
     const [showLayerInput, setShowLayerInput] = useState(false);
     const [layerInput, setLayerInput] = useState("");
+    const [finalAnswersSnapshot, setFinalAnswersSnapshot] = useState([]);
 
     // Load resume data from sessionStorage and generate questions
     useEffect(() => {
@@ -83,12 +84,15 @@ export default function ValidationForm() {
     const currentLayerQuestions = currentLayer.questions;
     const currentQuestion = currentLayerQuestions[currentQuestionIndex];
 
-    // Progress calculation
+    // Progress: questions = 0-75%, psych-games = 80%, submitting = 98%
     const totalQuestions = questions.reduce((sum, l) => sum + l.questions.length, 0);
     const questionsAnswered = questions
         .slice(0, currentLayerIndex)
         .reduce((sum, l) => sum + l.questions.length, 0) + currentQuestionIndex;
-    const progress = (questionsAnswered / totalQuestions) * 100;
+    const conversationProgress = (questionsAnswered / totalQuestions) * 75;
+    const progress = phase === "questions" ? conversationProgress
+        : phase === "psych-games" ? 80
+            : 98;
 
     const handleAnswerSubmit = () => {
         if (!currentAnswer.trim()) {
@@ -138,20 +142,29 @@ export default function ValidationForm() {
             setShowLayerInput(false);
             setLayerInput("");
         } else {
-            // Final submission
-            await finalSubmit(finalAnswers);
+            // All layers done — move to psych games phase
+            setFinalAnswersSnapshot(finalAnswers);
+            setPhase("psych-games");
         }
     };
 
-    const finalSubmit = async (finalData) => {
+    const handleGamesComplete = async (psychProfile) => {
+        setPhase("submitting");
+        await finalSubmit(finalAnswersSnapshot, psychProfile);
+    };
+
+    const finalSubmit = async (finalData, psychProfile = null) => {
         setSubmitting(true);
         try {
-            const result = await submitResumeValidation(resumeData, finalData);
+            const dataWithPsych = psychProfile
+                ? [...finalData, { layerId: "psychProfile", question: "Psychological Game Results", answer: JSON.stringify(psychProfile), type: "psych" }]
+                : finalData;
+
+            const result = await submitResumeValidation(resumeData, dataWithPsych);
             if (result) {
-                // Clean up sessionStorage
                 sessionStorage.removeItem("extractedResume");
                 toast.success("Validation completed! Generating your career blueprint...");
-                router.push("/onboarding/career-path");
+                router.replace("/onboarding/career-path");
             }
         } catch (error) {
             console.error(error);
@@ -167,6 +180,29 @@ export default function ValidationForm() {
             if (!submitting && !showLayerInput) handleAnswerSubmit();
         }
     };
+
+    // Psych Games Phase
+    if (phase === "psych-games") {
+        return (
+            <Card className="w-full max-w-2xl mx-auto shadow-lg">
+                <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                        <CardTitle className="text-2xl gradient-title flex items-center gap-2">
+                            <Brain className="h-6 w-6" /> Psychological Profile
+                        </CardTitle>
+                        <span className="text-sm text-muted-foreground">Phase 2 of 2</span>
+                    </div>
+                    <Progress value={80} className="h-2" />
+                    <CardDescription className="mt-2 text-base">
+                        3 quick mini-games to go beyond your resume. These reveal how your mind works.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <PsychGamesWrapper resumeData={resumeData} validationAnswers={finalAnswersSnapshot} onComplete={handleGamesComplete} />
+                </CardContent>
+            </Card>
+        );
+    }
 
     return (
         <Card className="w-full max-w-2xl mx-auto shadow-lg">

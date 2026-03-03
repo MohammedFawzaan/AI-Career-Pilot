@@ -47,7 +47,7 @@ export default function RoleCard({ role, index, analysis, selectedRole }) {
                 ? `I am an experienced professional looking to grow into ${role.role}. ${analysis.summary}`
                 : `I am aspiring to be a ${role.role}. ${analysis.summary}`;
 
-            router.push(`/onboarding?industry=${encodeURIComponent(industry)}&skills=${encodeURIComponent(skills)}&bio=${encodeURIComponent(bio)}&selectedRole=${encodeURIComponent(role.role)}`);
+            router.replace(`/onboarding?industry=${encodeURIComponent(industry)}&skills=${encodeURIComponent(skills)}&bio=${encodeURIComponent(bio)}&selectedRole=${encodeURIComponent(role.role)}`);
         } catch (error) {
             toast.error("Failed to select role. Please try again.");
             console.error(error);
