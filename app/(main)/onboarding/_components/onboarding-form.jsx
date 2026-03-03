@@ -95,7 +95,7 @@ export default function OnboardingForm({ industries }) {
       const formattedIndustry = `${values.industry}-${values.subIndustry}`;
       await updateUser({ ...values, industry: formattedIndustry });
       toast.success("Profile updated successfully!");
-      router.push("/dashboard");
+      router.push("/profile");
     } catch (error) {
       console.error("Onboarding error:", error);
       toast.error("Something went wrong. Please try again.");

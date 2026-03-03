@@ -4,6 +4,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -22,6 +23,12 @@ import QuizResult from "./quiz-result";
 export default function QuizList({ assessments }) {
   const router = useRouter();
   const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [navigating, setNavigating] = useState(false);
+
+  const handleStartQuiz = () => {
+    setNavigating(true);
+    router.push("/interview/mock");
+  };
 
   return (
     <>
@@ -36,8 +43,15 @@ export default function QuizList({ assessments }) {
                 Review your past quiz performance
               </CardDescription>
             </div>
-            <Button onClick={() => router.push("/interview/mock")}>
-              Start New Quiz
+            <Button onClick={handleStartQuiz} disabled={navigating}>
+              {navigating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Start New Quiz"
+              )}
             </Button>
           </div>
         </CardHeader>

@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { Edit2, Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Card,
@@ -27,14 +28,24 @@ import { deleteCoverLetter } from "@/actions/cover-letter";
 
 export default function CoverLetterList({ coverLetters }) {
   const router = useRouter();
+  const [viewingId, setViewingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
+  const handleView = (id) => {
+    setViewingId(id);
+    router.push(`/ai-cover-letter/${id}`);
+  };
 
   const handleDelete = async (id) => {
+    setDeletingId(id);
     try {
       await deleteCoverLetter(id);
       toast.success("Cover letter deleted successfully!");
       router.refresh();
     } catch (error) {
       toast.error(error.message || "Failed to delete cover letter");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -70,9 +81,14 @@ export default function CoverLetterList({ coverLetters }) {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => router.push(`/ai-cover-letter/${letter.id}`)}
+                    onClick={() => handleView(letter.id)}
+                    disabled={!!viewingId || !!deletingId}
                   >
-                    <Eye className="h-4 w-4" />
+                    {viewingId === letter.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                   <AlertDialogTrigger asChild>
                     <Button variant="outline" size="icon">
@@ -93,8 +109,13 @@ export default function CoverLetterList({ coverLetters }) {
                       <AlertDialogAction
                         onClick={() => handleDelete(letter.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        disabled={deletingId === letter.id}
                       >
-                        Delete
+                        {deletingId === letter.id ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</>
+                        ) : (
+                          "Delete"
+                        )}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

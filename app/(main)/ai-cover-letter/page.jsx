@@ -3,8 +3,20 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CoverLetterList from "./_components/cover-letter-list";
+import { getUser, getUserOnboardingStatus } from "@/actions/user";
+import { redirect } from "next/navigation";
 
 export default async function CoverLetterPage() {
+  const user = await getUser();
+  const { isOnboarded } = await getUserOnboardingStatus();
+  if (!user) redirect("/sign-in");
+  if (!isOnboarded) {
+    if (!user?.userType) {
+      redirect("/onboarding/selection");
+    }
+    redirect("/onboarding");
+  }
+
   const coverLetters = await getCoverLetters();
 
   return (

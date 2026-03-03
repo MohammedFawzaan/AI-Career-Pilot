@@ -28,7 +28,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-const DashboardView = ({ insights }) => {
+const DashboardView = ({ insights, user }) => {
+  // Parse human-readable industry name from the stored industry slug (e.g. "tech-software-development")
+  const industryLabel = insights?.industry
+    ? insights.industry
+      .split("-")
+      .slice(1)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ")
+    : null;
   // Transform salary data for the chart
   const salaryData = insights.salaryRanges.map((range) => ({
     name: range.role,
@@ -75,7 +83,17 @@ const DashboardView = ({ insights }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      {/* Industry header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+          <h1 className="text-3xl font-bold gradient-title">
+            Industry Insights
+            {industryLabel && (
+              <span className="text-muted-foreground font-medium text-2xl ml-2">· {industryLabel}</span>
+            )}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Real-time market data for your selected field</p>
+        </div>
         <Badge variant="outline">Last updated: {lastUpdatedDate}</Badge>
       </div>
 

@@ -10,6 +10,10 @@ export default async function OnboardingPage({ searchParams }) {
     redirect("/onboarding/selection");
   }
 
+  if (user.industry) {
+    redirect("/profile");
+  }
+
   const params = await searchParams;
 
   // Experienced users without a selected role who navigate here directly

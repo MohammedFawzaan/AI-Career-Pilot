@@ -33,7 +33,23 @@ import { improveWithAI } from "@/actions/improve";
 
 const ProfileForm = ({ industries, initialData }) => {
     const [isEditMode, setIsEditMode] = useState(false);
-    const [selectedIndustry, setSelectedIndustry] = useState(null);
+
+    // Compute and store industry/subIndustry from initialData ONCE so dropdowns can be initialised synchronously
+    const getInitialIndustryState = () => {
+        if (!initialData?.industry || !industries) return { industryId: "", subIndustry: "" };
+        for (const ind of industries) {
+            for (const sub of ind.subIndustries) {
+                const slug = `${ind.id}-${sub.toLowerCase().replace(/ /g, "-")}`;
+                if (slug === initialData.industry) {
+                    return { industryId: ind.id, subIndustry: sub, industryObj: ind };
+                }
+            }
+        }
+        return { industryId: "", subIndustry: "" };
+    };
+
+    const { industryId, subIndustry: initialSubIndustry, industryObj } = getInitialIndustryState();
+    const [selectedIndustry, setSelectedIndustry] = useState(industryObj || null);
 
     const {
         loading: updateLoading,
@@ -47,9 +63,12 @@ const ProfileForm = ({ industries, initialData }) => {
         formState: { errors },
         setValue,
         watch,
+        reset,
     } = useForm({
         resolver: zodResolver(onboardingSchema),
         defaultValues: {
+            industry: industryId,
+            subIndustry: initialSubIndustry,
             experience: initialData?.experience?.toString() || "",
             bio: initialData?.bio || "",
             skills: initialData?.skills?.join(", ") || "",
@@ -58,25 +77,23 @@ const ProfileForm = ({ industries, initialData }) => {
         },
     });
 
-    // Parse industry and subIndustry from initialData
+    // Reset form whenever edit mode opens to ensure dropdowns reflect the latest initialData
     useEffect(() => {
-        if (initialData?.industry && industries) {
-            let found = false;
-            for (const ind of industries) {
-                for (const sub of ind.subIndustries) {
-                    const slug = `${ind.id}-${sub.toLowerCase().replace(/ /g, "-")}`;
-                    if (slug === initialData.industry) {
-                        setValue("industry", ind.id);
-                        setSelectedIndustry(ind);
-                        setValue("subIndustry", sub);
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) break;
-            }
+        if (isEditMode) {
+            const { industryId: id, subIndustry: sub, industryObj: ind } = getInitialIndustryState();
+            setSelectedIndustry(ind || null);
+            reset({
+                industry: id,
+                subIndustry: sub,
+                experience: initialData?.experience?.toString() || "",
+                bio: initialData?.bio || "",
+                skills: initialData?.skills?.join(", ") || "",
+                country: initialData?.country || "",
+                city: initialData?.city || "",
+            });
         }
-    }, [initialData, industries, setValue]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isEditMode]);
 
     const [isImproving, setIsImproving] = useState(false);
 
