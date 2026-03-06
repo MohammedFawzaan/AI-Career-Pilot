@@ -9,7 +9,7 @@ import RoleCard from "./_components/role-card";
 import CountryRecommendations from "./_components/country-recommendations";
 import FeedbackForm from "./_components/feedback-form";
 import FeedbackStats from "./_components/feedback-stats";
-import { getPsychStats } from "@/actions/psych-stats";
+
 
 export default async function AssessmentResultPage() {
     const user = await getUser();
@@ -28,8 +28,8 @@ export default async function AssessmentResultPage() {
     const { analysis } = assessment;
     const isExperienced = analysis.userType === "EXPERIENCED";
 
-    // Fetch psychological stats
-    const psychStats = await getPsychStats();
+    // Psychological profile is now stored inside analysis
+    const psychProfile = analysis.psychologicalProfile || null;
 
     return (
         <main className="container mx-auto px-4 py-8 max-w-5xl">
@@ -90,8 +90,8 @@ export default async function AssessmentResultPage() {
                     </Card>
                 )}
 
-                {/* Psychological Stats Card */}
-                {psychStats && (
+                {/* Psychological Profile Card */}
+                {psychProfile && (
                     <Card className="col-span-full border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
@@ -99,60 +99,39 @@ export default async function AssessmentResultPage() {
                                 Psychological Profile
                             </CardTitle>
                             <CardDescription className="text-sm">
-                                Based on your cognitive mini-games assessment
+                                {psychProfile.summary || "Based on your psychological assessment games"}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-5">
-                            {/* Archetype & Stats Row */}
-                            <div className="flex items-center gap-4 flex-wrap">
-                                <div className="flex-1 min-w-[200px] p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-transparent border border-purple-500/20 text-center">
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Brain Type</p>
-                                    <p className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mt-1">{psychStats.archetype}</p>
+                            {/* Score Overview */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 to-transparent border border-indigo-500/20 text-center">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Cognitive</p>
+                                    <p className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent mt-1">{psychProfile.cognitiveIntelligence || 0}</p>
                                 </div>
-                                <div className="p-4 rounded-xl bg-gradient-to-br from-orange-500/10 to-transparent border border-orange-500/20 text-center">
-                                    <Zap className="h-4 w-4 text-orange-400 mx-auto mb-1" />
-                                    <p className="text-[10px] text-muted-foreground uppercase">Strength</p>
-                                    <p className="text-xs font-semibold mt-0.5">{psychStats.strength}</p>
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-teal-500/10 to-transparent border border-teal-500/20 text-center">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Focus</p>
+                                    <p className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent mt-1">{psychProfile.focusPrecision || 0}</p>
                                 </div>
-                                <div className="p-4 rounded-xl bg-gradient-to-br from-red-500/10 to-transparent border border-red-500/20 text-center">
-                                    <Shield className="h-4 w-4 text-red-400 mx-auto mb-1" />
-                                    <p className="text-[10px] text-muted-foreground uppercase">Risk Profile</p>
-                                    <p className="text-xs font-semibold mt-0.5">{psychStats.riskProfile}</p>
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20 text-center">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Curiosity</p>
+                                    <p className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mt-1">{psychProfile.curiosityLearning || 0}</p>
                                 </div>
                             </div>
 
-                            {/* Trait Bars */}
-                            {psychStats.traitScores && (() => {
-                                const traits = psychStats.traitScores;
-                                const bars = [
-                                    { label: "Analytical Depth", value: traits.decisionGame?.traits?.analytical || 50, color: "bg-orange-400" },
-                                    { label: "Risk Appetite", value: traits.decisionGame?.traits?.riskAppetite || 50, color: "bg-red-400" },
-                                    { label: "Pattern Recognition", value: traits.patternGame?.traits?.abstraction || 50, color: "bg-blue-400" },
-                                    { label: "Bug Detection", value: traits.patternGame?.traits?.anomalyDetection || 50, color: "bg-cyan-400" },
-                                    { label: "Career Prioritization", value: traits.patternGame?.traits?.prioritization || 50, color: "bg-amber-400" },
-                                    { label: "Decision Clarity", value: traits.patternGame?.traits?.decisionClarity || 50, color: "bg-emerald-400" },
-                                    { label: "Empathy", value: traits.personaGame?.bigFive?.A || 50, color: "bg-purple-400" },
-                                    { label: "Conscientiousness", value: traits.personaGame?.bigFive?.C || 50, color: "bg-green-400" },
-                                ];
-                                return (
-                                    <div className="space-y-2.5">
-                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Trait Breakdown</p>
-                                        <div className="grid gap-2.5 md:grid-cols-2">
-                                            {bars.map(bar => (
-                                                <div key={bar.label} className="space-y-1">
-                                                    <div className="flex justify-between text-xs">
-                                                        <span className="text-muted-foreground">{bar.label}</span>
-                                                        <span className="font-bold">{bar.value}</span>
-                                                    </div>
-                                                    <div className="h-2 rounded-full bg-muted/40 overflow-hidden">
-                                                        <div className={`h-full rounded-full ${bar.color}`} style={{ width: `${bar.value}%` }} />
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                            {/* Dominant Traits */}
+                            {psychProfile.dominantTraits && psychProfile.dominantTraits.length > 0 && (
+                                <div className="space-y-2">
+                                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dominant Traits</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {psychProfile.dominantTraits.map((trait, i) => (
+                                            <span key={i} className="text-xs px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 font-medium">
+                                                {trait}
+                                            </span>
+                                        ))}
                                     </div>
-                                );
-                            })()}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 )}

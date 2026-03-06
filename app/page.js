@@ -1,16 +1,6 @@
 import React from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
-  BrainCircuit,
-  Search,
-  MapPin,
-  Briefcase,
-  GraduationCap,
-  ScrollText,
-  PenBox,
-  LayoutDashboard,
   Sparkles,
   Target,
   TrendingUp,

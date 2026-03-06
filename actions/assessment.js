@@ -41,7 +41,7 @@ export async function generateNextQuestion(currentLayer, history) {
     }
 }
 
-export async function submitAssessment(fullProfile) {
+export async function submitAssessment(fullProfile, targetRole = null) {
     const { userId } = await auth();
     if (!userId) {
         console.error("submitAssessment: Unauthorized");
@@ -65,16 +65,20 @@ export async function submitAssessment(fullProfile) {
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         const prompt = `
-            You are an expert career counselor and psychologist. You have conducted a deep interview with a user AND they completed 3 psychological mini-games.
+            You are an expert career counselor and psychologist. You have conducted a deep interview with a user AND they completed 3 psychological assessment games.
             
             User Profile & Interview Details:
             ${JSON.stringify(fullProfile)}
 
-            A psychProfile from 3 psychological mini-games may be included in the data (type: 'psych').
+            ${targetRole ? `The user's desired target role/domain: "${targetRole}"` : "The user has not specified a target role."}
+
+            A psychProfile from 3 psychological assessment games may be included in the data (type: 'psych').
             If present, use its trait scores to enhance your analysis:
-            - decisionGame traits (analytical, riskAppetite, ethical, leadership, calmness)
-            - patternGame traits (abstraction, anomalyDetection, optimization)
-            - personaGame bigFive traits (openness, conscientiousness, extraversion, agreeableness, neuroticism)
+            - cognitiveGame: traits (analyticalThinking, logicalReasoning, problemSolving, decisionMaking) + overallScore
+            - focusGame: traits (attentionToDetail, accuracy, persistence, taskDiscipline) + overallScore
+            - curiosityGame: traits (curiosity, learningInitiative, adaptability, exploration) + overallScore
+
+            A roleTargeting section may also be present (type: 'roleTarget') with the user's desired role and personality-fit answers.
 
             Based on ALL these inputs, analyze the user's:
             1. Core Interests & Hobbies
@@ -83,7 +87,7 @@ export async function submitAssessment(fullProfile) {
             4. Career Goals
             5. Learning Ambitions
             6. Current Status & Satisfaction
-            7. Psychological profile and cognitive strengths from game scores
+            7. Psychological profile: Cognitive Intelligence, Focus & Precision, Curiosity & Learning Mindset
 
             Map these traits to the most suitable industries and roles — NOT limited to IT.
             Consider ANY industry or career path that fits their profile, skills, and ambitions (e.g., healthcare, finance, education, creative arts, engineering, business, etc.).
@@ -93,15 +97,19 @@ export async function submitAssessment(fullProfile) {
             Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):
             {
                 "primaryProfile": "A 2-3 word catchphrase describing their profile (e.g., 'The Logical Architect')",
-                "summary": "A brief 2-sentence summary of why this profile fits them — reference both interview answers AND personality traits from game scores.",
-                "personalityArchetype": "A powerful archetype title based on game scores (e.g., 'Systems Architect', 'Risk-Driven Innovator', 'Empathetic Builder')",
-                "cognitiveStrength": "Their standout cognitive ability from game scores (e.g., 'Structured Abstraction', 'Anomaly Detection')",
-                "riskProfile": "Low / Moderate / High — derived from decisionGame riskAppetite score",
+                "summary": "A brief 2-sentence summary of why this profile fits them — reference both interview answers AND psychological scores.",
+                "psychologicalProfile": {
+                    "cognitiveIntelligence": 75,
+                    "focusPrecision": 68,
+                    "curiosityLearning": 82,
+                    "dominantTraits": ["Analytical Thinking", "Curiosity"],
+                    "summary": "Brief description of their psychological strengths"
+                },
                 "recommendedIndustries": [
                     { "industry": "Name of Industry", "score": 85, "reason": "Why this industry fits their profile" }
                 ],
                 "recommendedRoles": [
-                    { "role": "Name of Role", "description": "Brief description", "matchReason": "Why this role fits — reference verified skills AND personality/cognitive scores" },
+                    { "role": "Name of Role", "description": "Brief description", "matchReason": "Why this role fits — reference skills AND psychological scores" },
                     { "role": "Second Best Role", "description": "Brief description", "matchReason": "Why this role fits" },
                     { "role": "Third Best Role", "description": "Brief description", "matchReason": "Why this role fits" }
                 ],
@@ -127,10 +135,9 @@ export async function submitAssessment(fullProfile) {
             IMPORTANT:
             - 'identifiedSkills': Extract skills the user *explicitly mentioned* or *demonstrated*.
             - 'recommendedSkills': Suggest skills they *need* for the recommended roles.
-            - 'personalityArchetype': Short, evocative title — not a generic label
-            - 'cognitiveStrength': Pick the single strongest trait from game scores
-            - 'riskProfile': Map riskAppetite: 0-40 = Low, 41-70 = Moderate, 71-100 = High
+            - 'psychologicalProfile': Include all 3 scores from the games (0-100 each)
             - 'recommendedCountries': Suggest 3-5 countries with high demand for the recommended roles.
+            - If user specified a target role, factor it heavily into role recommendations.
         `;
 
         const result = await model.generateContent(prompt);
@@ -149,16 +156,18 @@ export async function submitAssessment(fullProfile) {
         const assessment = await db.careerAssessment.upsert({
             where: { userId: user.id },
             update: {
-                questions: [fullProfile], // Store full conversational profile
-                primaryRole: null, // Let user select their preferred role
+                questions: [fullProfile],
+                primaryRole: null,
+                targetRole: targetRole || null,
                 analysis: analysis,
                 recommendedCountries: analysis.recommendedCountries || [],
                 updatedAt: new Date(),
             },
             create: {
                 userId: user.id,
-                questions: [fullProfile], // Store full conversational profile
-                primaryRole: null, // Let user select their preferred role
+                questions: [fullProfile],
+                primaryRole: null,
+                targetRole: targetRole || null,
                 analysis: analysis,
                 recommendedCountries: analysis.recommendedCountries || [],
             },

@@ -16,12 +16,21 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { resumeValidationLayers } from "@/data/resumeValidationLayers";
 import { generateValidationQuestions, submitResumeValidation } from "@/actions/resume-validation";
-import { Loader2, Send, ArrowRight, CheckCircle2, Brain } from "lucide-react";
+import { Loader2, Send, ArrowRight, CheckCircle2, Brain, Target, ClipboardCheck } from "lucide-react";
+import SectionIndicator from "@/components/assessment/SectionIndicator";
+import RoleTargetingSection from "@/components/assessment/RoleTargetingSection";
 import PsychGamesWrapper from "./PsychGamesWrapper";
+
+const SECTIONS = [
+    { label: "Resume Validation", icon: ClipboardCheck },
+    { label: "Role Targeting", icon: Target },
+    { label: "Psych Profile", icon: Brain },
+];
 
 export default function ValidationForm() {
     const router = useRouter();
-    const [phase, setPhase] = useState("questions"); // 'questions' | 'psych-games' | 'submitting'
+    // 'questions' | 'role-targeting' | 'psych-games' | 'submitting'
+    const [phase, setPhase] = useState("questions");
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [questions, setQuestions] = useState(null);
@@ -35,6 +44,10 @@ export default function ValidationForm() {
     const [showLayerInput, setShowLayerInput] = useState(false);
     const [layerInput, setLayerInput] = useState("");
     const [finalAnswersSnapshot, setFinalAnswersSnapshot] = useState([]);
+
+    // Section 2 data
+    const [roleTargetData, setRoleTargetData] = useState(null);
+    const [targetRole, setTargetRole] = useState(null);
 
     // Load resume data from sessionStorage and generate questions
     useEffect(() => {
@@ -50,7 +63,6 @@ export default function ValidationForm() {
                 const parsed = JSON.parse(stored);
                 setResumeData(parsed);
 
-                // Generate validation questions from resume
                 const result = await generateValidationQuestions(parsed);
                 setQuestions(result.layers);
                 setLoading(false);
@@ -84,15 +96,19 @@ export default function ValidationForm() {
     const currentLayerQuestions = currentLayer.questions;
     const currentQuestion = currentLayerQuestions[currentQuestionIndex];
 
-    // Progress: questions = 0-75%, psych-games = 80%, submitting = 98%
+    // Section index for indicator
+    const sectionIndex = phase === "questions" ? 0
+        : phase === "role-targeting" ? 1
+            : 2;
+
+    // Progress within section 1
     const totalQuestions = questions.reduce((sum, l) => sum + l.questions.length, 0);
     const questionsAnswered = questions
         .slice(0, currentLayerIndex)
         .reduce((sum, l) => sum + l.questions.length, 0) + currentQuestionIndex;
-    const conversationProgress = (questionsAnswered / totalQuestions) * 75;
-    const progress = phase === "questions" ? conversationProgress
-        : phase === "psych-games" ? 80
-            : 98;
+    const sectionProgress = phase === "questions"
+        ? (questionsAnswered / totalQuestions) * 100
+        : 100;
 
     const handleAnswerSubmit = () => {
         if (!currentAnswer.trim()) {
@@ -111,18 +127,14 @@ export default function ValidationForm() {
         setAnswers(updatedAnswers);
         setCurrentAnswer("");
 
-        // Check if this was the last question in the current layer
         if (currentQuestionIndex >= currentLayerQuestions.length - 1) {
-            // Layer complete
             setShowLayerInput(true);
         } else {
-            // Next question in same layer
             setCurrentQuestionIndex(prev => prev + 1);
         }
     };
 
     const handleLayerCompletion = async () => {
-        // Save optional input
         let finalAnswers = [...answers];
         if (layerInput.trim()) {
             finalAnswers = [...finalAnswers, {
@@ -135,17 +147,22 @@ export default function ValidationForm() {
             setAnswers(finalAnswers);
         }
 
-        // Move to next layer or submit
         if (currentLayerIndex < totalLayers - 1) {
             setCurrentLayerIndex(prev => prev + 1);
             setCurrentQuestionIndex(0);
             setShowLayerInput(false);
             setLayerInput("");
         } else {
-            // All layers done — move to psych games phase
+            // Section 1 done → move to Section 2 (Role Targeting)
             setFinalAnswersSnapshot(finalAnswers);
-            setPhase("psych-games");
+            setPhase("role-targeting");
         }
+    };
+
+    const handleRoleTargetComplete = (data) => {
+        setRoleTargetData(data);
+        setTargetRole(data?.targetRole || null);
+        setPhase("psych-games");
     };
 
     const handleGamesComplete = async (psychProfile) => {
@@ -156,16 +173,33 @@ export default function ValidationForm() {
     const finalSubmit = async (finalData, psychProfile = null) => {
         setSubmitting(true);
         try {
-            const dataWithPsych = psychProfile
-                ? [...finalData, { layerId: "psychProfile", question: "Psychological Game Results", answer: JSON.stringify(psychProfile), type: "psych" }]
-                : finalData;
+            const dataWithExtras = [...finalData];
 
-            const result = await submitResumeValidation(resumeData, dataWithPsych);
+            // Add role targeting data
+            if (roleTargetData) {
+                dataWithExtras.push({
+                    layerId: "roleTargeting",
+                    question: "Role Targeting Data",
+                    answer: JSON.stringify(roleTargetData),
+                    type: "roleTarget",
+                });
+            }
+
+            // Add psych profile
+            if (psychProfile) {
+                dataWithExtras.push({
+                    layerId: "psychProfile",
+                    question: "Psychological Game Results",
+                    answer: JSON.stringify(psychProfile),
+                    type: "psych",
+                });
+            }
+
+            const result = await submitResumeValidation(resumeData, dataWithExtras, targetRole);
             if (result) {
                 sessionStorage.removeItem("extractedResume");
                 toast.success("Validation completed! Generating your career blueprint...");
                 router.replace("/onboarding/career-path");
-                // Don't setSubmitting(false) here to keep the loader visible during transition
             } else {
                 setSubmitting(false);
             }
@@ -183,32 +217,61 @@ export default function ValidationForm() {
         }
     };
 
-    // Psych Games Phase
-    if (phase === "psych-games") {
+    // Section 2: Role Targeting
+    if (phase === "role-targeting") {
         return (
             <Card className="w-full max-w-2xl mx-auto shadow-lg">
                 <CardHeader>
+                    <SectionIndicator sections={SECTIONS} activeIndex={1} />
                     <div className="flex items-center justify-between mb-2">
                         <CardTitle className="text-2xl gradient-title flex items-center gap-2">
-                            <Brain className="h-6 w-6" /> Psychological Profile
+                            <Target className="h-6 w-6" /> Role Targeting
                         </CardTitle>
-                        <span className="text-sm text-muted-foreground">Phase 2 of 2</span>
+                        <span className="text-sm text-muted-foreground">Section 2 of 3</span>
                     </div>
-                    <Progress value={80} className="h-2" />
-                    <CardDescription className="mt-2 text-base">
-                        3 quick mini-games to go beyond your resume. These reveal how your mind works.
+                    <CardDescription className="text-base">
+                        Tell us which role or domain you&apos;re targeting. We&apos;ll evaluate your personality fit & learning capability for it.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <PsychGamesWrapper resumeData={resumeData} validationAnswers={finalAnswersSnapshot} onComplete={handleGamesComplete} />
+                    <RoleTargetingSection
+                        skipLabel="I am happy with my current domain and want to grow more into this"
+                        section1Context={answers}
+                        onComplete={handleRoleTargetComplete}
+                    />
                 </CardContent>
             </Card>
         );
     }
 
+    // Section 3: Psych Games
+    if (phase === "psych-games") {
+        return (
+            <Card className="w-full max-w-2xl mx-auto shadow-lg">
+                <CardHeader>
+                    <SectionIndicator sections={SECTIONS} activeIndex={2} />
+                    <div className="flex items-center justify-between mb-2">
+                        <CardTitle className="text-2xl gradient-title flex items-center gap-2">
+                            <Brain className="h-6 w-6" /> Psychological Profile
+                        </CardTitle>
+                        <span className="text-sm text-muted-foreground">Section 3 of 3</span>
+                    </div>
+                    <CardDescription className="text-base">
+                        3 quick mini-games to complete your psychological profile.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <PsychGamesWrapper targetRole={targetRole} onComplete={handleGamesComplete} />
+                </CardContent>
+            </Card>
+        );
+    }
+
+    // Section 1: Resume Validation
     return (
         <Card className="w-full max-w-2xl mx-auto shadow-lg">
             <CardHeader>
+                <SectionIndicator sections={SECTIONS} activeIndex={0} />
                 <div className="flex items-center justify-between mb-2">
                     <CardTitle className="text-2xl gradient-title">
                         {currentLayer.name}
@@ -217,7 +280,7 @@ export default function ValidationForm() {
                         Layer {currentLayerIndex + 1} of {totalLayers}
                     </span>
                 </div>
-                <Progress value={progress} className="h-2" />
+                <Progress value={sectionProgress} className="h-2" />
                 <CardDescription className="mt-2 text-base">
                     {showLayerInput
                         ? "Great! Before we move on, is there anything else you'd like to add?"
@@ -282,7 +345,7 @@ export default function ValidationForm() {
                                     ) : (
                                         <CheckCircle2 className="mr-2 h-4 w-4" />
                                     )}
-                                    Finish Validation
+                                    Next Section
                                 </>
                             )}
                         </Button>

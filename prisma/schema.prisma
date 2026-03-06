@@ -37,7 +37,6 @@ model User {
   userType      UserType? // Enum to store if user is fresher or experienced
   careerAssessment CareerAssessment?
   careerRoadmap CareerRoadmap?
-  psychologicalStats PsychologicalStats?
 }
 
 // Combined Industry Trends and Salary Insights
@@ -75,12 +74,12 @@ model CareerAssessment {
   user                  User                @relation(fields: [userId], references: [id])
   questions             Json[]              // Array of {questionId, answer}
   primaryRole           String?             // Top recommended role (optional - user selects)
-  analysis              Json                // Complete AI analysis including secondary options, learning path, etc.
+  targetRole            String?             // User's desired target role/domain from Section 2
+  analysis              Json                // Complete AI analysis including psych profile, secondary options, learning path, etc.
   recommendedCountries  Json[]              // Country recommendations based on role demand
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   feedback              AssessmentFeedback?
-  psychologicalStats    PsychologicalStats?
 }
 
 model AssessmentFeedback {
@@ -104,20 +103,6 @@ model CareerRoadmap {
   progress          Json      // Track completed items
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
-}
-
-model PsychologicalStats {
-  id                String             @id @default(cuid())
-  userId            String             @unique
-  user              User               @relation(fields: [userId], references: [id])
-  assessmentId      String?            @unique
-  assessment        CareerAssessment?  @relation(fields: [assessmentId], references: [id])
-  archetype         String             // e.g. "Systems Architect"
-  strength          String             // e.g. "Structured Abstraction"
-  riskProfile       String             // "Low", "Moderate", "High"
-  traitScores       Json               // Full trait breakdown from all 3 games
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
 }
 
 model Assessment {

@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -7,8 +5,10 @@ import { SignedIn, SignedOut, SignInButton, UserButton, ClerkLoading, ClerkLoade
 import { Loader2 } from "lucide-react";
 import { HeaderClient } from "./header-client";
 import { GrowthToolsDropdown } from "./growth-tools-dropdown";
+import { checkUser } from "@/lib/checkUser";
 
-export default function Header() {
+export default async function Header() {
+  await checkUser();
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
