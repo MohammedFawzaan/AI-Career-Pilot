@@ -52,9 +52,10 @@ export async function generateRoleFitQuestions(targetRole, section1Context = [])
         - The purpose is to check if the person CAN LEARN the target role — NOT if their personality fits it
         - Do NOT ask about teamwork, leadership, stress handling, or motivation
         - Do NOT ask technical questions about the target role
-        - Questions should feel conversational, like a mentor evaluating a student's learning potential
+        - KEEP QUESTIONS SHORT
+        - Questions should feel conversational but direct, like a mentor evaluating a student's learning potential
         - If Section 1 data is available, reference the person's background subtly 
-          (e.g., "Given your experience in [their field], how would you approach learning [target role concepts]?")
+          (e.g., "Given your [their field] background, how would you approach learning [target concept]?")
         - Each question should help determine: "Can this person successfully learn and transition into this new domain?"
 
         Return ONLY valid JSON (no markdown, no extra text):

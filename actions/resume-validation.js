@@ -143,7 +143,7 @@ export async function generateValidationQuestions(extractedResume) {
     }
 }
 
-export async function submitResumeValidation(resumeData, validationAnswers, targetRole = null) {
+export async function submitResumeValidation(resumeData, validationAnswers, targetRole = null, psychScores = null) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -176,10 +176,10 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
             ${targetRole ? `The user's desired target role/domain: "${targetRole}"` : "The user has not specified a target role."}
 
             A psychProfile from 3 psychological assessment games may be included in the answers (type: 'psych').
-            If present, use its trait scores to enhance your analysis:
-            - cognitiveGame: traits (analyticalThinking, logicalReasoning, problemSolving, decisionMaking) + overallScore
-            - focusGame: traits (attentionToDetail, accuracy, persistence, taskDiscipline) + overallScore
-            - curiosityGame: traits (curiosity, learningInitiative, adaptability, exploration) + overallScore
+            If present, use the provided scores to enhance your analysis:
+            - Cognitive Intelligence Score: ${psychScores?.cognitiveScore ?? 'N/A'}/100
+            - Focus & Precision Score: ${psychScores?.focusScore ?? 'N/A'}/100
+            - Curiosity & Learning Score: ${psychScores?.curiosityScore ?? 'N/A'}/100
 
             A roleTargeting section may also be present (type: 'roleTarget') with the user's desired role and personality-fit answers.
 
@@ -270,7 +270,7 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                recommendedCountries: analysis.recommendedCountries || [],
+                psychScores: psychScores || undefined,
                 updatedAt: new Date(),
             },
             create: {
@@ -279,7 +279,7 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                recommendedCountries: analysis.recommendedCountries || [],
+                psychScores: psychScores || undefined,
             },
         });
 

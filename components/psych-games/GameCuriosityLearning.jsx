@@ -5,10 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Sparkles, CheckCircle2, ChevronRight, Compass } from "lucide-react";
 
+/**
+ * Curiosity & Learning Mindset Game — Priority Selection (Weighted)
+ * Each option has a predefined weight (0-10).
+ * Score = (selectedWeight / maxWeight) × 100
+ * Final score = average of all round scores.
+ */
 export default function GameCuriosityLearning({ rounds, onComplete }) {
     const [roundIndex, setRoundIndex] = useState(0);
     const [selectedOption, setSelectedOption] = useState(null);
-    const [traitScores, setTraitScores] = useState({ curiosity: 50, learningInitiative: 50, adaptability: 50, exploration: 50 });
+    const [roundScores, setRoundScores] = useState([]);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [gameFinished, setGameFinished] = useState(false);
     const finalScoresRef = useRef(null);
@@ -19,40 +25,21 @@ export default function GameCuriosityLearning({ rounds, onComplete }) {
     useEffect(() => {
         if (gameFinished && finalScoresRef.current) {
             const scores = finalScoresRef.current;
-            const overall = Math.round(Object.values(scores).reduce((a, b) => a + b, 0) / Object.keys(scores).length);
-            const dominant = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
-            const labelMap = {
-                curiosity: "Curiosity",
-                learningInitiative: "Learning Initiative",
-                adaptability: "Adaptability",
-                exploration: "Exploration Mindset",
-            };
-            onComplete({
-                traits: scores,
-                dominantTrait: labelMap[dominant] || dominant,
-                overallScore: overall,
-            });
+            const overall = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+            onComplete({ overallScore: overall, roundScores: scores });
         }
     }, [gameFinished, onComplete]);
 
     const handleSubmit = () => {
         if (!selectedOption) return;
 
-        setTraitScores(prev => {
-            const newScores = { ...prev };
-            if (rounds?.[roundIndex]) {
-                const chosen = rounds[roundIndex].options.find(o => o.id === selectedOption);
-                if (chosen) {
-                    Object.entries(chosen.traits).forEach(([trait, val]) => {
-                        newScores[trait] = Math.min(100, Math.max(0, (newScores[trait] || 50) + val));
-                    });
-                }
-            }
-            if (roundIndex >= (rounds?.length || 1) - 1) {
-                finalScoresRef.current = newScores;
-            }
-            return newScores;
-        });
+        const chosen = round?.options?.find(o => o.id === selectedOption);
+        const maxWeight = Math.max(...(round?.options?.map(o => o.weight) || [10]));
+        const selectedWeight = chosen?.weight ?? 0;
+        const score = maxWeight > 0 ? Math.round((selectedWeight / maxWeight) * 100) : 0;
+
+        const newScores = [...roundScores, score];
+        setRoundScores(newScores);
 
         setIsTransitioning(true);
         setTimeout(() => {
@@ -61,6 +48,7 @@ export default function GameCuriosityLearning({ rounds, onComplete }) {
                 setSelectedOption(null);
                 setIsTransitioning(false);
             } else {
+                finalScoresRef.current = newScores;
                 setGameFinished(true);
             }
         }, 400);

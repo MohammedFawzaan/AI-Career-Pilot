@@ -31,7 +31,7 @@ model User {
   skills        String[]  // Array of skills
   country       String?   // User's country for location-based job search
   city          String?   // User's city for location-based job search
-  assessments   Assessment[]
+  interviewQuizzes InterviewQuiz[]
   resume        Resume?
   coverLetter   CoverLetter[]
   userType      UserType? // Enum to store if user is fresher or experienced
@@ -76,7 +76,7 @@ model CareerAssessment {
   primaryRole           String?             // Top recommended role (optional - user selects)
   targetRole            String?             // User's desired target role/domain from Section 2
   analysis              Json                // Complete AI analysis including psych profile, secondary options, learning path, etc.
-  recommendedCountries  Json[]              // Country recommendations based on role demand
+  psychScores           Json?               // { cognitiveScore, focusScore, curiosityScore } — calculated in-code
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   feedback              AssessmentFeedback?
@@ -105,7 +105,7 @@ model CareerRoadmap {
   updatedAt         DateTime  @updatedAt
 }
 
-model Assessment {
+model InterviewQuiz {
   id            String    @id @default(cuid())
   userId        String
   user          User      @relation(fields: [userId], references: [id])

@@ -145,12 +145,12 @@ export default function AssessmentForm() {
         setPhase("psych-games");
     };
 
-    const handleGamesComplete = async (psychProfile) => {
+    const handleGamesComplete = async (psychData) => {
         setPhase("submitting");
-        await finalSubmit(history, psychProfile);
+        await finalSubmit(history, psychData?.psychScores || null);
     };
 
-    const finalSubmit = async (finalData, psychProfile = null) => {
+    const finalSubmit = async (finalData, psychScores = null) => {
         setLoading(true);
         try {
             const dataWithExtras = [...finalData];
@@ -165,17 +165,17 @@ export default function AssessmentForm() {
                 });
             }
 
-            // Add psych profile
-            if (psychProfile) {
+            // Add psych scores summary
+            if (psychScores) {
                 dataWithExtras.push({
                     layerId: "psychProfile",
                     question: "Psychological Game Results",
-                    answer: JSON.stringify(psychProfile),
+                    answer: JSON.stringify(psychScores),
                     type: "psych"
                 });
             }
 
-            const result = await submitAssessment(dataWithExtras, targetRole);
+            const result = await submitAssessment(dataWithExtras, targetRole, psychScores);
             if (result) {
                 toast.success("Assessment completed!");
                 router.replace("/onboarding/career-path");

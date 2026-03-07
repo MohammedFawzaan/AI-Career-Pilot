@@ -157,9 +157,9 @@ export default function PsychGamesWrapper({ targetRole, onComplete }) {
 
     if (gameStep === "reveal" && scores) {
         const scoreCards = [
-            { label: "Cognitive Intelligence", value: scores.cognitiveIntelligence, icon: Brain, color: "text-indigo-400", bg: "from-indigo-500/10", border: "border-indigo-500/20", dominant: psychProfile.cognitiveGame?.dominantTrait },
-            { label: "Focus & Precision", value: scores.focusPrecision, icon: Crosshair, color: "text-teal-400", bg: "from-teal-500/10", border: "border-teal-500/20", dominant: psychProfile.focusGame?.dominantTrait },
-            { label: "Curiosity & Learning", value: scores.curiosityLearning, icon: Sparkles, color: "text-amber-400", bg: "from-amber-500/10", border: "border-amber-500/20", dominant: psychProfile.curiosityGame?.dominantTrait },
+            { label: "Cognitive Intelligence", value: scores.cognitiveIntelligence, icon: Brain, color: "text-indigo-400", bg: "from-indigo-500/10", border: "border-indigo-500/20" },
+            { label: "Focus & Precision", value: scores.focusPrecision, icon: Crosshair, color: "text-teal-400", bg: "from-teal-500/10", border: "border-teal-500/20" },
+            { label: "Curiosity & Learning", value: scores.curiosityLearning, icon: Sparkles, color: "text-amber-400", bg: "from-amber-500/10", border: "border-amber-500/20" },
         ];
         const overallAvg = Math.round((scores.cognitiveIntelligence + scores.focusPrecision + scores.curiosityLearning) / 3);
 
@@ -194,15 +194,13 @@ export default function PsychGamesWrapper({ targetRole, onComplete }) {
                                 <div className="h-2 rounded-full bg-muted/30 overflow-hidden">
                                     <div className={`h-full rounded-full bg-current ${card.color} transition-all duration-1000`} style={{ width: `${card.value}%` }} />
                                 </div>
-                                {card.dominant && (
-                                    <p className="text-[11px] text-muted-foreground">Strongest: <span className="font-semibold text-foreground">{card.dominant}</span></p>
-                                )}
+
                             </div>
                         );
                     })}
                 </div>
 
-                <Button onClick={() => { setIsSubmitting(true); onComplete(psychProfile); }} className="w-full" size="lg" disabled={isSubmitting}>
+                <Button onClick={() => { setIsSubmitting(true); onComplete({ psychScores: { cognitiveScore: scores.cognitiveIntelligence, focusScore: scores.focusPrecision, curiosityScore: scores.curiosityLearning } }); }} className="w-full" size="lg" disabled={isSubmitting}>
                     {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating Your Career Path...</> : <>Generate My Career Path 🎯</>}
                 </Button>
             </div>

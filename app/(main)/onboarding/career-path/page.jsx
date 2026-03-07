@@ -10,7 +10,6 @@ import CountryRecommendations from "./_components/country-recommendations";
 import FeedbackForm from "./_components/feedback-form";
 import FeedbackStats from "./_components/feedback-stats";
 
-
 export default async function AssessmentResultPage() {
     const user = await getUser();
     if (!user) redirect("/sign-in");
@@ -28,8 +27,13 @@ export default async function AssessmentResultPage() {
     const { analysis } = assessment;
     const isExperienced = analysis.userType === "EXPERIENCED";
 
-    // Psychological profile is now stored inside analysis
-    const psychProfile = analysis.psychologicalProfile || null;
+    // Psychological scores stored in DB (calculated in-code) or fallback to AI-generated profile in analysis
+    const psychScores = assessment.psychScores || null;
+    const psychProfile = psychScores ? {
+        cognitiveIntelligence: psychScores.cognitiveScore || 0,
+        focusPrecision: psychScores.focusScore || 0,
+        curiosityLearning: psychScores.curiosityScore || 0,
+    } : analysis.psychologicalProfile || null;
 
     return (
         <main className="container mx-auto px-4 py-8 max-w-5xl">

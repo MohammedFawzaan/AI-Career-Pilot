@@ -13,8 +13,8 @@ export async function generateNextQuestion(currentLayer, history) {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `
-        You are a warm, insightful career coach having a genuine conversation (not an exam).
-        Current Topic: "${currentLayer.name}"
+        You are a professional career assessment evaluator. You are conducting a structured assessment — not a casual conversation.
+        Current Assessment Topic: "${currentLayer.name}"
         Initial Question: "${currentLayer.initialQuestion}"
 
         Conversation History for this topic:
@@ -23,11 +23,13 @@ export async function generateNextQuestion(currentLayer, history) {
         Based on the user's previous answers, generate the NEXT single follow-up question.
         
         IMPORTANT RULES:
-        - Do NOT drill deeper into the same specific detail. Instead, PIVOT to a DIFFERENT, BROADER ANGLE of the topic.
-        - Keep the tone warm, curious, and conversational — like a career coach, not an interviewer.
-        - Ask open-ended questions that encourage reflection and self-discovery.
+        - Do NOT drill deeper into the same specific detail. PIVOT to a DIFFERENT ANGLE of the topic.
+        - Keep the tone professional, clear, and evaluative — like an assessment, not a friendly chat.
+        - Ask direct, purposeful questions that extract concrete information about the user.
+        - Do NOT use phrases like "That's great!", "Interesting!", "Tell me more" or any filler.
         - Do NOT repeat questions or ask about something they already answered.
-        - The question should feel natural, like the next thing a thoughtful coach would ask.
+        - The question should be concise (1-2 sentences max) and assessment-focused.
+        - Focus on extracting facts, preferences, skills, and goals — not feelings or reflections.
         Return ONLY the question text.
     `;
 
@@ -41,7 +43,7 @@ export async function generateNextQuestion(currentLayer, history) {
     }
 }
 
-export async function submitAssessment(fullProfile, targetRole = null) {
+export async function submitAssessment(fullProfile, targetRole = null, psychScores = null) {
     const { userId } = await auth();
     if (!userId) {
         console.error("submitAssessment: Unauthorized");
@@ -73,10 +75,10 @@ export async function submitAssessment(fullProfile, targetRole = null) {
             ${targetRole ? `The user's desired target role/domain: "${targetRole}"` : "The user has not specified a target role."}
 
             A psychProfile from 3 psychological assessment games may be included in the data (type: 'psych').
-            If present, use its trait scores to enhance your analysis:
-            - cognitiveGame: traits (analyticalThinking, logicalReasoning, problemSolving, decisionMaking) + overallScore
-            - focusGame: traits (attentionToDetail, accuracy, persistence, taskDiscipline) + overallScore
-            - curiosityGame: traits (curiosity, learningInitiative, adaptability, exploration) + overallScore
+            If present, use the provided scores to enhance your analysis:
+            - Cognitive Intelligence Score: ${psychScores?.cognitiveScore ?? 'N/A'}/100
+            - Focus & Precision Score: ${psychScores?.focusScore ?? 'N/A'}/100
+            - Curiosity & Learning Score: ${psychScores?.curiosityScore ?? 'N/A'}/100
 
             A roleTargeting section may also be present (type: 'roleTarget') with the user's desired role and personality-fit answers.
 
@@ -160,7 +162,7 @@ export async function submitAssessment(fullProfile, targetRole = null) {
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                recommendedCountries: analysis.recommendedCountries || [],
+                psychScores: psychScores || undefined,
                 updatedAt: new Date(),
             },
             create: {
@@ -169,7 +171,7 @@ export async function submitAssessment(fullProfile, targetRole = null) {
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                recommendedCountries: analysis.recommendedCountries || [],
+                psychScores: psychScores || undefined,
             },
         });
 

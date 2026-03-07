@@ -165,12 +165,12 @@ export default function ValidationForm() {
         setPhase("psych-games");
     };
 
-    const handleGamesComplete = async (psychProfile) => {
+    const handleGamesComplete = async (psychData) => {
         setPhase("submitting");
-        await finalSubmit(finalAnswersSnapshot, psychProfile);
+        await finalSubmit(finalAnswersSnapshot, psychData?.psychScores || null);
     };
 
-    const finalSubmit = async (finalData, psychProfile = null) => {
+    const finalSubmit = async (finalData, psychScores = null) => {
         setSubmitting(true);
         try {
             const dataWithExtras = [...finalData];
@@ -185,17 +185,17 @@ export default function ValidationForm() {
                 });
             }
 
-            // Add psych profile
-            if (psychProfile) {
+            // Add psych scores summary
+            if (psychScores) {
                 dataWithExtras.push({
                     layerId: "psychProfile",
                     question: "Psychological Game Results",
-                    answer: JSON.stringify(psychProfile),
+                    answer: JSON.stringify(psychScores),
                     type: "psych",
                 });
             }
 
-            const result = await submitResumeValidation(resumeData, dataWithExtras, targetRole);
+            const result = await submitResumeValidation(resumeData, dataWithExtras, targetRole, psychScores);
             if (result) {
                 sessionStorage.removeItem("extractedResume");
                 toast.success("Validation completed! Generating your career blueprint...");
