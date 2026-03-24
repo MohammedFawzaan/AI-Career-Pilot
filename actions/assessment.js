@@ -173,7 +173,15 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
         `;
 
         const result = await model.generateContent(prompt);
-        const text = result.response.text().replace(/```json/g, "").replace(/```/g, "").trim();
+        let text = result.response.text();
+        
+        // Clean markdown and isolate JSON block
+        text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            text = text.substring(firstBrace, lastBrace + 1);
+        }
 
         console.log("submitAssessment: Generated AI response length:", text.length);
 

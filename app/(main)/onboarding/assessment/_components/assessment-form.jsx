@@ -255,7 +255,19 @@ export default function AssessmentForm() {
         );
     }
 
-    // Section 1: Career Discovery
+    if (phase === "submitting") {
+        return (
+            <Card className="w-full max-w-2xl mx-auto shadow-lg">
+                <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                    <p className="font-semibold text-lg">Generating your Career Blueprint...</p>
+                    <p className="text-sm text-muted-foreground">This may take a moment. Please don&apos;t close the tab.</p>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (phase !== "conversation") return null;
     return (
         <Card className="w-full max-w-2xl mx-auto shadow-lg">
             <CardHeader>
