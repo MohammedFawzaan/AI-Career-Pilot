@@ -3,6 +3,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    serverBodySizeLimit: "10mb",
+  },
   serverExternalPackages: ["pdf-parse", "pdfjs-dist"],
   images: {
     remotePatterns: [

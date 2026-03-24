@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
+export const maxDuration = 30;
+
 export async function POST(request) {
     try {
         const formData = await request.formData();
@@ -18,15 +22,11 @@ export async function POST(request) {
         let extractedText = "";
 
         if (fileName.endsWith(".pdf")) {
-            // Use require() instead of import() — serverExternalPackages in next.config.mjs
-            // ensures Node.js resolves this natively (no bundling = no worker issues)
-            const { PDFParse } = require("pdf-parse");
-            const pdf = new PDFParse({ data: new Uint8Array(buffer) });
-            await pdf.load();
-            const result = await pdf.getText();
-            extractedText = result.text;
+            const pdfParse = require("pdf-parse");
+            const data = await pdfParse(buffer);
+            extractedText = data.text;
         } else if (fileName.endsWith(".docx")) {
-            const mammoth = await import("mammoth");
+            const mammoth = require("mammoth");
             const result = await mammoth.extractRawText({ buffer });
             extractedText = result.value;
         } else {
