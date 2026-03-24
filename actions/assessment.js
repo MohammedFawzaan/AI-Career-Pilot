@@ -75,10 +75,13 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
             ${targetRole ? `The user's desired target role/domain: "${targetRole}"` : "The user has not specified a target role."}
 
             A psychProfile from 3 psychological assessment games may be included in the data (type: 'psych').
-            If present, use the provided scores to enhance your analysis:
+            If present, use the provided scores to enhance your analysis and GENERATE detailed sub-scores.
             - Cognitive Intelligence Score: ${psychScores?.cognitiveScore ?? 'N/A'}/100
+              Round Data: ${JSON.stringify(psychScores?.cognitiveRoundScores || [])}
             - Focus & Precision Score: ${psychScores?.focusScore ?? 'N/A'}/100
+              Round Data: ${JSON.stringify(psychScores?.focusRoundScores || [])}
             - Curiosity & Learning Score: ${psychScores?.curiosityScore ?? 'N/A'}/100
+              Round Data: ${JSON.stringify(psychScores?.curiosityRoundScores || [])}
 
             A roleTargeting section may also be present (type: 'roleTarget') with the user's desired role and personality-fit answers.
 
@@ -91,29 +94,53 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
             6. Current Status & Satisfaction
             7. Psychological profile: Cognitive Intelligence, Focus & Precision, Curiosity & Learning Mindset
 
-            Map these traits to the most suitable industries and roles — NOT limited to IT.
-            Consider ANY industry or career path that fits their profile, skills, and ambitions (e.g., healthcare, finance, education, creative arts, engineering, business, etc.).
-            Use the following industry list as a reference, but feel free to suggest industries OUTSIDE this list if they are a better fit: 
-            ${JSON.stringify(industries.map(i => ({ name: i.name, sub: i.subIndustries })))}
+            Map these traits to the most suitable roles — NOT limited to IT.
+            Consider ANY career path that fits their profile, skills, and ambitions (e.g., healthcare, finance, education, creative arts, engineering, business, etc.).
 
             Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):
             {
                 "primaryProfile": "A 2-3 word catchphrase describing their profile (e.g., 'The Logical Architect')",
                 "summary": "A brief 2-sentence summary of why this profile fits them — reference both interview answers AND psychological scores.",
                 "psychologicalProfile": {
-                    "cognitiveIntelligence": 75,
-                    "focusPrecision": 68,
-                    "curiosityLearning": 82,
+                    "cognitive": {
+                        "overall": 75,
+                        "analyticalThinking": 80,
+                        "logicalReasoning": 70,
+                        "problemSolving": 75,
+                        "decisionMaking": 72
+                    },
+                    "focusPrecision": {
+                        "overall": 68,
+                        "accuracy": 72,
+                        "persistence": 65
+                    },
+                    "curiosityLearning": {
+                        "overall": 82,
+                        "curiosity": 85,
+                        "adaptability": 80,
+                        "learningInitiative": 78
+                    },
                     "dominantTraits": ["Analytical Thinking", "Curiosity"],
-                    "summary": "Brief description of their psychological strengths"
+                    "summary": "Brief psychological analysis based on the detailed round performance"
                 },
-                "recommendedIndustries": [
-                    { "industry": "Name of Industry", "score": 85, "reason": "Why this industry fits their profile" }
-                ],
+                "targetRoleCareerPath": {
+                    "role": "Target Role Name (only if specified by user)",
+                    "description": "Brief description of the role",
+                    "matchReason": "Why they fit this target role...",
+                    "matchScore": 85,
+                    "feasibility": "High Fit/Moderate Fit/Low Fit",
+                    "feasibilityReason": "Detailed 2-3 sentence explanation of WHY they are a fit or not for this target role based on their skills and psychological profile.",
+                    "careerLadder": [
+                        { "level": 1, "title": "Junior/Entry Title", "timeframe": "0-2 years" },
+                        { "level": 2, "title": "Mid-Level Title", "timeframe": "2-5 years" },
+                        { "level": 3, "title": "Senior Title", "timeframe": "5-8 years" }
+                    ],
+                    "keyMilestones": ["Milestone 1 to achieve", "Milestone 2", "Milestone 3"]
+                },
                 "recommendedRoles": [
-                    { "role": "Name of Role", "description": "Brief description", "matchReason": "Why this role fits — reference skills AND psychological scores" },
-                    { "role": "Second Best Role", "description": "Brief description", "matchReason": "Why this role fits" },
-                    { "role": "Third Best Role", "description": "Brief description", "matchReason": "Why this role fits" }
+                    { "role": "Name of Role", "description": "Brief description", "matchReason": "Why this role fits — reference skills AND psychological scores", "matchScore": 92 },
+                    { "role": "Second Best Role", "description": "Brief description", "matchReason": "Why this role fits", "matchScore": 85 },
+                    { "role": "Third Best Role", "description": "Brief description", "matchReason": "Why this role fits", "matchScore": 75 }
                 ],
                 "recommendedCountries": [
                     { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" },
@@ -121,10 +148,12 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
                     { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" }
                 ],
                 "identifiedSkills": [
-                    "Skill 1 (User has)", "Skill 2 (User has)"
+                    { "skill": "Skill 1 (User has)", "proficiency": "Strong/Moderate/Basic" },
+                    { "skill": "Skill 2 (User has)", "proficiency": "Strong/Moderate/Basic" }
                 ],
                 "recommendedSkills": [
-                   "Skill 1 (To learn)", "Skill 2 (To learn)"
+                    { "skill": "Skill 1 (To learn)", "reason": "Why needed", "priority": "High/Medium/Low" },
+                    { "skill": "Skill 2 (To learn)", "reason": "Why needed", "priority": "High/Medium/Low" }
                 ],
                 "skillGap": [
                     { "skill": "Skill Name", "priority": "High" } 
@@ -134,12 +163,13 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
                 ]
             }
             
-            IMPORTANT:
+            IMPORTANT RULES:
+            - 'targetRoleCareerPath': ONLY generate this object if the user has specified a target role. If they skipped it, completely omit this key.
+            - If 'targetRoleCareerPath' is generated, the target role MUST NOT appear in 'recommendedRoles'. 'recommendedRoles' must be 3 DIFFERENT roles.
             - 'identifiedSkills': Extract skills the user *explicitly mentioned* or *demonstrated*.
-            - 'recommendedSkills': Suggest skills they *need* for the recommended roles.
-            - 'psychologicalProfile': Include all 3 scores from the games (0-100 each)
+            - 'recommendedSkills': Suggest skills they *need* for the recommended roles and target role.
+            - 'psychologicalProfile': Generate the 9 detailed sub-scores (0-100) by analyzing their round-by-round performance in the games.
             - 'recommendedCountries': Suggest 3-5 countries with high demand for the recommended roles.
-            - If user specified a target role, factor it heavily into role recommendations.
         `;
 
         const result = await model.generateContent(prompt);
@@ -162,7 +192,6 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                psychScores: psychScores || undefined,
                 updatedAt: new Date(),
             },
             create: {
@@ -171,7 +200,6 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                psychScores: psychScores || undefined,
             },
         });
 

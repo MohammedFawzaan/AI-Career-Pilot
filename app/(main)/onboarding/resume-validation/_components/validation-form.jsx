@@ -235,7 +235,7 @@ export default function ValidationForm() {
                 </CardHeader>
                 <CardContent>
                     <RoleTargetingSection
-                        skipLabel="I am happy with my current domain and want to grow more into this"
+                        skipLabel="I am happy with my current domain and want to grow more into this."
                         section1Context={answers}
                         onComplete={handleRoleTargetComplete}
                     />
@@ -267,7 +267,21 @@ export default function ValidationForm() {
         );
     }
 
+    // Submitting phase
+    if (phase === "submitting") {
+        return (
+            <Card className="w-full max-w-2xl mx-auto shadow-lg">
+                <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                    <p className="font-semibold text-lg">Generating your Career Blueprint...</p>
+                    <p className="text-sm text-muted-foreground">This may take a moment. Please don&apos;t close the tab.</p>
+                </CardContent>
+            </Card>
+        );
+    }
+
     // Section 1: Resume Validation
+    if (phase !== "questions") return null;
     return (
         <Card className="w-full max-w-2xl mx-auto shadow-lg">
             <CardHeader>
@@ -345,7 +359,7 @@ export default function ValidationForm() {
                                     ) : (
                                         <CheckCircle2 className="mr-2 h-4 w-4" />
                                     )}
-                                    Next Section
+                                    Complete Assessment
                                 </>
                             )}
                         </Button>

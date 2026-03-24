@@ -6,9 +6,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 /**
  * Generates content for all 3 psychological assessment games.
  * Each game uses a DIFFERENT evaluation technique:
- *   1. Cognitive: Decision Ranking (user ranks actions, compared to expert ranking)
- *   2. Focus: Error Detection (user identifies errors in statements)
- *   3. Curiosity: Priority Selection (each option has a weight, score = weight/max)
+ *   1. Cognitive: Weighted Single Selection (pick best action, scored 100/70/40/10)
+ *   2. Focus: Correct Identification (find the ONE correct claim among 3 wrong ones)
+ *   3. Curiosity: Priority Ranking (rank learning approaches, compared to expert order)
  *
  * Scoring is done IN-CODE, not by AI.
  */
@@ -39,56 +39,63 @@ export async function generatePsychGameContent(context) {
 
         ────────────────────────────────────────────
         GAME 1: Cognitive Intelligence Assessment (5 rounds)
-        TECHNIQUE: Decision Ranking
+        TECHNIQUE: Weighted Single Selection
         ────────────────────────────────────────────
-        Each round presents a scenario with exactly 4 possible actions.
-        The user will RANK these actions from Best (1st) to Worst (4th).
-        You must provide the EXPERT RANKING (the correct order).
+        Each round presents a realistic workplace/life scenario requiring good judgment.
+        The user picks the BEST course of action from 4 options.
+        Each option has an expert weight reflecting how good the decision is.
 
         Each round has:
         - "scenario": A realistic workplace or life situation (2-3 sentences)
-        - "question": What needs to be decided
-        - "actions": Array of exactly 4 actions, each with "id" (a/b/c/d) and "text"
-        - "expertRanking": Array of action IDs in correct order [best → worst]
-          e.g. ["c", "a", "d", "b"] means action C is best, B is worst
+        - "question": "What is the best course of action?"
+        - "options": Array of exactly 4 options, each with:
+          - "id" (a/b/c/d)
+          - "text": The action description (1-2 sentences)
+          - "weight": Expert weight — one of: 100 (best), 70 (good), 40 (mediocre), 10 (poor)
+          - "explanation": Brief 1-sentence expert explanation of why this ranks where it does
+        - Each round must have exactly one option with weight 100, one with 70, one with 40, one with 10
+        - Options must be REAL decisions (not obvious/trick answers)
 
         ────────────────────────────────────────────
         GAME 2: Focus & Precision Assessment (5 rounds)
-        TECHNIQUE: Error Detection
+        TECHNIQUE: Correct Identification
         ────────────────────────────────────────────
-        Each round presents a statement, process, or workflow description that contains ERRORS.
-        The user must identify which items are INCORRECT.
+        Each round presents a detailed scenario, process, report, or factual description.
+        Then shows 4 claims about the scenario. Only ONE claim is CORRECT, the other 3 are WRONG.
+        The user must identify the ONE correct claim.
 
         Each round has:
-        - "scenario": A description of a workplace process, report, or statement (3-5 sentences)
-        - "question": "Which of the following claims about the above are INCORRECT?"
-        - "claims": Array of exactly 4 claims about the scenario, each with:
+        - "scenario": A detailed workplace process, report, or factual description (3-5 sentences with specific details like numbers, dates, names, sequences)
+        - "question": "Which of the following claims about the above is CORRECT?"
+        - "claims": Array of exactly 4 claims, each with:
           - "id" (a/b/c/d)
           - "text": The claim text
-          - "isError": true if this claim is INCORRECT, false if correct
-        - Make exactly 2 claims incorrect (isError: true) and 2 correct (isError: false) per round
+          - "isCorrect": true for the ONE correct claim, false for the 3 wrong ones
+        - Make exactly 1 claim correct (isCorrect: true) and 3 wrong (isCorrect: false)
+        - Wrong claims should be SUBTLY wrong (changed numbers, swapped details, slight inaccuracies) — NOT obviously false
 
         ────────────────────────────────────────────
         GAME 3: Curiosity & Learning Mindset Assessment (5 rounds)
-        TECHNIQUE: Priority Selection (Weighted Options)
+        TECHNIQUE: Priority Ranking of Learning Approaches
         ────────────────────────────────────────────
-        Each round presents an unfamiliar situation and asks how the person would respond.
-        Each option has a predefined curiosity WEIGHT (0-10).
+        Each round presents an unfamiliar situation where the user encounters something new.
+        The user must RANK 4 learning approaches from "try first" (1st) to "try last" (4th).
+        You provide the expert curiosity ranking (the ideal order for a curious learner).
 
-        Weight guide:
-        - Exploration / Experimentation → 10
-        - Reading documentation / Deep research → 9
-        - Asking a mentor / Seeking guidance → 7
-        - Surface-level attempt → 4
-        - Ignoring / Avoiding the issue → 0
+        Ranking guide (most curious → least curious):
+        - Hands-on exploration / experimentation → rank highest
+        - Deep independent research / documentation → rank second
+        - Asking mentors / seeking external guidance → rank third
+        - Avoiding / sticking with what's familiar → rank lowest
 
         Each round has:
-        - "scenario": Something new or unfamiliar (2-3 sentences)
-        - "question": "How would you respond?"
-        - "options": Array of exactly 4 options, each with:
+        - "scenario": An unfamiliar situation where the user encounters something new (2-3 sentences)
+        - "question": "How would you prioritize these approaches?"
+        - "approaches": Array of exactly 4 approaches, each with:
           - "id" (a/b/c/d)
-          - "text": The option text
-          - "weight": Integer 0-10 (curiosity weight)
+          - "text": The learning approach description
+        - "expertRanking": Array of approach IDs in ideal curiosity order [most curious → least curious]
+          e.g. ["b", "d", "a", "c"] means approach B is most curious, C is least
 
         ────────────────────────────────────────────
         RETURN FORMAT — valid JSON only, no markdown blocks:
@@ -98,44 +105,44 @@ export async function generatePsychGameContent(context) {
                 {
                     "scenario": "A realistic situation",
                     "question": "What is the best course of action?",
-                    "actions": [
-                        { "id": "a", "text": "Action A" },
-                        { "id": "b", "text": "Action B" },
-                        { "id": "c", "text": "Action C" },
-                        { "id": "d", "text": "Action D" }
-                    ],
-                    "expertRanking": ["c", "a", "d", "b"]
+                    "options": [
+                        { "id": "a", "text": "Action A description", "weight": 100, "explanation": "This is the best because..." },
+                        { "id": "b", "text": "Action B description", "weight": 70, "explanation": "Good but misses..." },
+                        { "id": "c", "text": "Action C description", "weight": 40, "explanation": "Mediocre because..." },
+                        { "id": "d", "text": "Action D description", "weight": 10, "explanation": "Poor because..." }
+                    ]
                 }
             ],
             "focusRounds": [
                 {
-                    "scenario": "A detailed process description with some errors",
-                    "question": "Which claims about the above are INCORRECT?",
+                    "scenario": "A detailed process with specific facts, numbers, and sequences",
+                    "question": "Which of the following claims about the above is CORRECT?",
                     "claims": [
-                        { "id": "a", "text": "Claim A", "isError": true },
-                        { "id": "b", "text": "Claim B", "isError": false },
-                        { "id": "c", "text": "Claim C", "isError": true },
-                        { "id": "d", "text": "Claim D", "isError": false }
+                        { "id": "a", "text": "Claim A (wrong - subtle error)", "isCorrect": false },
+                        { "id": "b", "text": "Claim B (correct)", "isCorrect": true },
+                        { "id": "c", "text": "Claim C (wrong - subtle error)", "isCorrect": false },
+                        { "id": "d", "text": "Claim D (wrong - subtle error)", "isCorrect": false }
                     ]
                 }
             ],
             "curiosityRounds": [
                 {
                     "scenario": "An unfamiliar situation",
-                    "question": "How would you respond?",
-                    "options": [
-                        { "id": "a", "text": "Dive in and explore", "weight": 10 },
-                        { "id": "b", "text": "Research first", "weight": 9 },
-                        { "id": "c", "text": "Ask someone", "weight": 7 },
-                        { "id": "d", "text": "Ignore it", "weight": 0 }
-                    ]
+                    "question": "How would you prioritize these approaches?",
+                    "approaches": [
+                        { "id": "a", "text": "Approach A" },
+                        { "id": "b", "text": "Approach B" },
+                        { "id": "c", "text": "Approach C" },
+                        { "id": "d", "text": "Approach D" }
+                    ],
+                    "expertRanking": ["b", "d", "a", "c"]
                 }
             ]
         }
 
         IMPORTANT:
-        - cognitiveRounds: exactly 5
-        - focusRounds: exactly 5 (each with exactly 2 errors and 2 correct claims)
+        - cognitiveRounds: exactly 5 (each with weights 100, 70, 40, 10)
+        - focusRounds: exactly 5 (each with exactly 1 correct and 3 wrong claims, wrong ones must be SUBTLY wrong)
         - curiosityRounds: exactly 5
         - ALL scenarios must be GENERAL — everyday workplace/life, NOT technical
         - Return ONLY valid JSON, no markdown, no extra text

@@ -3,7 +3,6 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { industries } from "@/data/industries";
 
 export async function generateValidationQuestions(extractedResume) {
     const { userId } = await auth();
@@ -176,28 +175,44 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
             ${targetRole ? `The user's desired target role/domain: "${targetRole}"` : "The user has not specified a target role."}
 
             A psychProfile from 3 psychological assessment games may be included in the answers (type: 'psych').
-            If present, use the provided scores to enhance your analysis:
+            If present, use the provided scores to enhance your analysis and GENERATE detailed sub-scores:
             - Cognitive Intelligence Score: ${psychScores?.cognitiveScore ?? 'N/A'}/100
+              Round Data: ${JSON.stringify(psychScores?.cognitiveRoundScores || [])}
             - Focus & Precision Score: ${psychScores?.focusScore ?? 'N/A'}/100
+              Round Data: ${JSON.stringify(psychScores?.focusRoundScores || [])}
             - Curiosity & Learning Score: ${psychScores?.curiosityScore ?? 'N/A'}/100
+              Round Data: ${JSON.stringify(psychScores?.curiosityRoundScores || [])}
 
             A roleTargeting section may also be present (type: 'roleTarget') with the user's desired role and personality-fit answers.
 
-            Map their verified skills, validated experience, and cognitive profile to the most suitable industries and roles — NOT limited to IT.
-            Consider ANY industry or career path that fits their profile (e.g., healthcare, finance, education, creative arts, engineering, business, etc.).
-            Use the following industry list as a reference, but feel free to suggest industries OUTSIDE this list if they are a better fit:
-            ${JSON.stringify(industries.map(i => ({ name: i.name, sub: i.subIndustries })))}
+            Map their verified skills, validated experience, and cognitive profile to the most suitable roles — NOT limited to IT.
+            Consider ANY career path that fits their profile (e.g., healthcare, finance, education, creative arts, engineering, business, etc.).
 
             Return the result in the following JSON format ONLY (valid JSON, no markdown blocks):
             {
                 "primaryProfile": "A 2-3 word catchphrase describing their professional profile (e.g., 'The Systems Architect', 'The Data Strategist')",
                 "summary": "A brief 2-sentence summary analyzing their resume vs validation performance AND psychological scores.",
                 "psychologicalProfile": {
-                    "cognitiveIntelligence": 75,
-                    "focusPrecision": 68,
-                    "curiosityLearning": 82,
+                    "cognitive": {
+                        "overall": 75,
+                        "analyticalThinking": 80,
+                        "logicalReasoning": 70,
+                        "problemSolving": 75,
+                        "decisionMaking": 72
+                    },
+                    "focusPrecision": {
+                        "overall": 68,
+                        "accuracy": 72,
+                        "persistence": 65
+                    },
+                    "curiosityLearning": {
+                        "overall": 82,
+                        "curiosity": 85,
+                        "adaptability": 80,
+                        "learningInitiative": 78
+                    },
                     "dominantTraits": ["Analytical Thinking", "Persistence"],
-                    "summary": "Brief description of their psychological strengths"
+                    "summary": "Brief psychological analysis based on the detailed round performance"
                 },
                 "validationScore": {
                     "overall": 85,
@@ -206,13 +221,24 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
                     "crossSkillReasoning": 85,
                     "confidenceAlignment": 80
                 },
-                "recommendedIndustries": [
-                    { "industry": "Name of Industry", "score": 85, "reason": "Why this industry fits their growth trajectory" }
-                ],
+                "targetRoleCareerPath": {
+                    "role": "Target Role Name (only if specified by user)",
+                    "description": "Brief description of the role",
+                    "matchReason": "Why they fit this target role based on verified skills...",
+                    "matchScore": 85,
+                    "feasibility": "High Fit/Moderate Fit/Low Fit",
+                    "feasibilityReason": "Detailed 2-3 sentence explanation of WHY they are a fit or not for this target role.",
+                    "careerLadder": [
+                        { "level": 1, "title": "Junior/Entry Title", "timeframe": "0-2 years" },
+                        { "level": 2, "title": "Mid-Level Title", "timeframe": "2-5 years" },
+                        { "level": 3, "title": "Senior Title", "timeframe": "5-8 years" }
+                    ],
+                    "keyMilestones": ["Milestone 1 to achieve", "Milestone 2", "Milestone 3"]
+                },
                 "recommendedRoles": [
-                    { "role": "Future Growth Role 1", "description": "Brief description", "matchReason": "Why this role fits — reference verified skills AND psychological scores" },
-                    { "role": "Future Growth Role 2", "description": "Brief description", "matchReason": "Why this role fits" },
-                    { "role": "Future Growth Role 3", "description": "Brief description", "matchReason": "Why this role fits" }
+                    { "role": "Future Growth Role 1", "description": "Brief description", "matchReason": "Why this role fits — reference verified skills AND psychological scores", "matchScore": 92 },
+                    { "role": "Future Growth Role 2", "description": "Brief description", "matchReason": "Why this role fits", "matchScore": 85 },
+                    { "role": "Future Growth Role 3", "description": "Brief description", "matchReason": "Why this role fits", "matchScore": 75 }
                 ],
                 "recommendedCountries": [
                     { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" },
@@ -220,10 +246,12 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
                     { "country": "Country Name", "demandLevel": "High/Medium/Low", "reason": "Why" }
                 ],
                 "identifiedSkills": [
-                    "Verified Skill 1", "Verified Skill 2"
+                    { "skill": "Verified Skill 1", "proficiency": "Strong/Moderate/Basic" },
+                    { "skill": "Verified Skill 2", "proficiency": "Strong/Moderate/Basic" }
                 ],
                 "recommendedSkills": [
-                    "Growth Skill 1 (To learn for future roles)", "Growth Skill 2"
+                    { "skill": "Growth Skill 1 (To learn)", "reason": "Why needed", "priority": "High/Medium/Low" },
+                    { "skill": "Growth Skill 2 (To learn)", "reason": "Why needed", "priority": "High/Medium/Low" }
                 ],
                 "skillGap": [
                     { "skill": "Skill Name", "priority": "High" }
@@ -236,15 +264,16 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
                 "areasOfConcern": ["Any skill that seemed overclaimed based on validation answers"]
             }
 
-            IMPORTANT:
+            IMPORTANT RULES:
+            - 'targetRoleCareerPath': ONLY generate this object if the user has specified a target role. If they skipped it, completely omit this key.
+            - If 'targetRoleCareerPath' is generated, the target role MUST NOT appear in 'recommendedRoles'. 'recommendedRoles' must be 3 DIFFERENT roles.
             - 'recommendedRoles' should be FUTURE GROWTH roles, not their current position
             - 'identifiedSkills': Skills VERIFIED through validation answers
             - 'recommendedSkills': Skills they need for future growth roles
-            - 'psychologicalProfile': Include all 3 scores from the games (0-100 each)
+            - 'psychologicalProfile': Generate the 9 detailed sub-scores (0-100) by analyzing their round-by-round performance in the games.
             - 'validationScore': Rate each area 0-100
             - 'resumeAuthenticity': Overall assessment of resume truthfulness
             - 'recommendedCountries': Suggest 3-5 countries with demand for their growth roles
-            - If user specified a target role, factor it heavily into role recommendations
             - If validation answers were weak for a claimed skill, note it in 'areasOfConcern'
         `;
 
@@ -270,7 +299,6 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                psychScores: psychScores || undefined,
                 updatedAt: new Date(),
             },
             create: {
@@ -279,7 +307,6 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
                 primaryRole: null,
                 targetRole: targetRole || null,
                 analysis: analysis,
-                psychScores: psychScores || undefined,
             },
         });
 
