@@ -22,7 +22,8 @@ export async function POST(request) {
         let extractedText = "";
 
         if (fileName.endsWith(".pdf")) {
-            const pdfParse = require("pdf-parse");
+            // pdf-parse v1.1.1 - use lib path to skip test file I/O on Vercel
+            const pdfParse = require("pdf-parse/lib/pdf-parse.js");
             const data = await pdfParse(buffer);
             extractedText = data.text;
         } else if (fileName.endsWith(".docx")) {
