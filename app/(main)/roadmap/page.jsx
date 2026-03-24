@@ -59,7 +59,7 @@ export default async function RoadmapPage() {
                                 <div className="flex flex-wrap gap-1.5">
                                     {assessment.analysis.identifiedSkills.slice(0, 6).map((skill, idx) => (
                                         <Badge key={idx} variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                            {skill}
+                                            {typeof skill === 'string' ? skill : skill.skill}
                                         </Badge>
                                     ))}
                                     {assessment.analysis.identifiedSkills.length > 6 && (
@@ -76,7 +76,7 @@ export default async function RoadmapPage() {
                                 <div className="flex flex-wrap gap-1.5">
                                     {assessment.analysis.recommendedSkills.slice(0, 6).map((skill, idx) => (
                                         <Badge key={idx} variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
-                                            {skill}
+                                            {typeof skill === 'string' ? skill : skill.skill}
                                         </Badge>
                                     ))}
                                     {assessment.analysis.recommendedSkills.length > 6 && (

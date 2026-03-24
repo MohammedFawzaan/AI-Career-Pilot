@@ -180,7 +180,8 @@ export async function fetchCertificates() {
             throw new Error("Please complete your career assessment first");
         }
 
-        const recommendedSkills = user.careerAssessment.analysis.recommendedSkills;
+        const rawSkills = user.careerAssessment.analysis.recommendedSkills;
+        const recommendedSkills = rawSkills.map(s => typeof s === 'string' ? s : s.skill).filter(Boolean);
 
         // Take first 2-3 skills to avoid too many API calls
         const topSkills = recommendedSkills.slice(0, 2);

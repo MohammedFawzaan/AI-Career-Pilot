@@ -17,7 +17,7 @@ export default function MockInterviewPage() {
         <div>
           <h1 className="text-6xl font-bold gradient-title">Mock Interview</h1>
           <p className="text-muted-foreground">
-            Test your knowledge with industry-specific questions
+            Test your knowledge with an AI mock interview. Questions are uniquely generated based on your <strong className="text-foreground">Skills</strong> listed on you profile or a <strong className="text-foreground">Custom Topic</strong> of your choice.
           </p>
         </div>
       </div>

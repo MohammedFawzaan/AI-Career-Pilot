@@ -129,7 +129,7 @@ export async function generateValidationQuestions(extractedResume) {
     try {
         const result = await model.generateContent(prompt);
         let text = result.response.text();
-        
+
         // Clean markdown and isolate JSON block
         text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
         const firstBrace = text.indexOf('{');
@@ -274,7 +274,7 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
             }
 
             IMPORTANT RULES:
-            - 'targetRoleCareerPath': ONLY generate this object if the user has specified a target role. If they skipped it, completely omit this key.
+            - 'targetRoleCareerPath': ONLY generate this object if the user has specified a target role. If they provided a target role, you MUST generate this object, EVEN IF their assessment answers were extremely poor. If they are a poor fit, set 'feasibility' to 'Low Fit' and aggressively explain why they lack the skills in 'feasibilityReason', but DO NOT omit the object.
             - If 'targetRoleCareerPath' is generated, the target role MUST NOT appear in 'recommendedRoles'. 'recommendedRoles' must be 3 DIFFERENT roles.
             - 'recommendedRoles' should be FUTURE GROWTH roles, not their current position
             - 'identifiedSkills': Skills VERIFIED through validation answers
@@ -287,7 +287,14 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
         `;
 
         const result = await model.generateContent(prompt);
-        const text = result.response.text().replace(/```json/g, "").replace(/```/g, "").trim();
+        let text = result.response.text();
+
+        text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            text = text.substring(firstBrace, lastBrace + 1);
+        }
 
         console.log("submitResumeValidation: Generated AI response length:", text.length);
 

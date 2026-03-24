@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { generateQuiz, saveQuizResult } from "@/actions/interview";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
@@ -21,6 +22,7 @@ export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [customTopic, setCustomTopic] = useState("");
 
   const {
     loading: generatingQuiz,
@@ -80,7 +82,7 @@ export default function Quiz() {
     setCurrentQuestion(0);
     setAnswers([]);
     setShowExplanation(false);
-    generateQuizFn();
+    generateQuizFn(customTopic);
     setResultData(null);
   };
 
@@ -103,14 +105,26 @@ export default function Quiz() {
         <CardHeader>
           <CardTitle>Ready to test your knowledge?</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <p className="text-muted-foreground">
             This quiz contains 10 questions specific to your industry and
             skills. Take your time and choose the best answer for each question.
           </p>
+          <div className="space-y-2">
+            <Label htmlFor="customTopic">Generate questions about a specific topic (Optional)</Label>
+            <Input 
+              id="customTopic"
+              placeholder="e.g. React Hooks, AWS Networking, Next.js App Router" 
+              value={customTopic}
+              onChange={(e) => setCustomTopic(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              If left blank, questions will be generated ONLY based on the skills listed in your profile.
+            </p>
+          </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={generateQuizFn} className="w-full">
+          <Button onClick={() => generateQuizFn(customTopic)} className="w-full">
             Start Quiz
           </Button>
         </CardFooter>

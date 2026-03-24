@@ -7,7 +7,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-export async function generateQuiz() {
+export async function generateQuiz(customTopic = "") {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -21,8 +21,17 @@ export async function generateQuiz() {
 
   if (!user) throw new Error("User not found");
 
+  if (!customTopic && (!user.skills || user.skills.length === 0)) {
+    throw new Error("No skills found. Please add skills to your profile or enter a custom topic below.");
+  }
+
+  const topicContext = customTopic 
+    ? `the specific topic: "${customTopic}"` 
+    : `their listed skills: ${user.skills.join(", ")}`;
+
   const prompt = `
-    Generate 10 technical interview questions for a ${user.industry} professional${user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""}.
+    Generate 10 technical interview questions for a professional in the ${user.industry} industry.
+    The questions MUST be strictly and ONLY based on ${topicContext}. Do not ask general industry questions outside of these parameters.
     
     Each question should be multiple choice with 4 options.
     

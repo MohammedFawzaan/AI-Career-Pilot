@@ -282,21 +282,25 @@ export default async function AssessmentResultPage() {
                                 </div>
                             </div>
                             <div className="p-4 space-y-2">
-                                {analysis.identifiedSkills?.map((skill, i) => {
-                                    const name = typeof skill === "string" ? skill : skill.skill;
-                                    const prof = typeof skill === "string" ? "Demonstrated" : skill.proficiency;
-                                    const profColor = prof === "Strong"
-                                        ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                                        : prof === "Moderate"
-                                            ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                                            : "bg-slate-500/10 text-slate-400 border border-slate-500/20";
-                                    return (
-                                        <div key={i} className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-border/50 bg-card/60 hover:bg-muted/40 transition-colors">
-                                            <span className="text-sm font-medium">{name}</span>
-                                            <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold whitespace-nowrap ${profColor}`}>{prof}</span>
-                                        </div>
-                                    );
-                                })}
+                                {!analysis.identifiedSkills || analysis.identifiedSkills.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground text-center py-4 bg-card/60 rounded-xl border border-border/50">No specific skills identified.</p>
+                                ) : (
+                                    analysis.identifiedSkills.map((skill, i) => {
+                                        const name = typeof skill === "string" ? skill : skill.skill;
+                                        const prof = typeof skill === "string" ? "Demonstrated" : skill.proficiency;
+                                        const profColor = prof === "Strong"
+                                            ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                                            : prof === "Moderate"
+                                                ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                                                : "bg-slate-500/10 text-slate-400 border border-slate-500/20";
+                                        return (
+                                            <div key={i} className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-border/50 bg-card/60 hover:bg-muted/40 transition-colors">
+                                                <span className="text-sm font-medium">{name}</span>
+                                                <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold whitespace-nowrap ${profColor}`}>{prof}</span>
+                                            </div>
+                                        );
+                                    })
+                                )}
                             </div>
                         </div>
 
@@ -310,25 +314,29 @@ export default async function AssessmentResultPage() {
                                 </div>
                             </div>
                             <div className="p-4 space-y-2">
-                                {(analysis.recommendedSkills?.length > 0 ? analysis.recommendedSkills : analysis.skillGap)?.map((item, i) => {
-                                    const name = typeof item === "string" ? item : item.skill;
-                                    const priority = item.priority || "Medium";
-                                    const reason = item.reason || null;
-                                    const priColor = priority === "High"
-                                        ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                                        : priority === "Medium"
-                                            ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
-                                            : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
-                                    return (
-                                        <div key={i} className="flex flex-col gap-1.5 px-4 py-3 rounded-xl border border-border/50 bg-card/60 hover:bg-muted/40 transition-colors">
-                                            <div className="flex items-center justify-between gap-3">
-                                                <span className="text-sm font-medium">{name}</span>
-                                                <span className={`text-[10px] uppercase tracking-wide px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap ${priColor}`}>{priority}</span>
+                                {(!analysis.recommendedSkills || analysis.recommendedSkills.length === 0) && (!analysis.skillGap || analysis.skillGap.length === 0) ? (
+                                    <p className="text-sm text-muted-foreground text-center py-4 bg-card/60 rounded-xl border border-border/50">No new skills recommended at this time.</p>
+                                ) : (
+                                    (analysis.recommendedSkills?.length > 0 ? analysis.recommendedSkills : analysis.skillGap)?.map((item, i) => {
+                                        const name = typeof item === "string" ? item : item.skill;
+                                        const priority = item.priority || "Medium";
+                                        const reason = item.reason || null;
+                                        const priColor = priority === "High"
+                                            ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                                            : priority === "Medium"
+                                                ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
+                                                : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
+                                        return (
+                                            <div key={i} className="flex flex-col gap-1.5 px-4 py-3 rounded-xl border border-border/50 bg-card/60 hover:bg-muted/40 transition-colors">
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <span className="text-sm font-medium">{name}</span>
+                                                    <span className={`text-[10px] uppercase tracking-wide px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap ${priColor}`}>{priority}</span>
+                                                </div>
+                                                {reason && <p className="text-xs text-muted-foreground line-clamp-2">{reason}</p>}
                                             </div>
-                                            {reason && <p className="text-xs text-muted-foreground line-clamp-2">{reason}</p>}
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })
+                                )}
                             </div>
                         </div>
                     </div>
