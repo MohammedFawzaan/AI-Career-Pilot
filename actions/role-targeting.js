@@ -74,7 +74,17 @@ export async function generateRoleFitQuestions(targetRole, section1Context = [])
 
     try {
         const result = await model.generateContent(prompt);
-        const text = result.response.text().replace(/```json/g, "").replace(/```/g, "").trim();
+        // More robust JSON extraction to handle various markdown artifacts
+        let text = result.response.text();
+        text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
+
+        // Try to extract just the JSON part if there is any stray text
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            text = text.substring(firstBrace, lastBrace + 1);
+        }
+
         const parsed = JSON.parse(text);
 
         if (!parsed.questions || parsed.questions.length < 7) {
@@ -83,7 +93,7 @@ export async function generateRoleFitQuestions(targetRole, section1Context = [])
 
         return parsed;
     } catch (error) {
-        console.error("generateRoleFitQuestions error:", error);
+        console.error("generateRoleFitQuestions error:", error.message);
         throw new Error("Failed to generate role-fit questions: " + error.message);
     }
 }

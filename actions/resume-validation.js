@@ -128,16 +128,25 @@ export async function generateValidationQuestions(extractedResume) {
 
     try {
         const result = await model.generateContent(prompt);
-        const text = result.response.text().replace(/```json/g, "").replace(/```/g, "").trim();
+        let text = result.response.text();
+        
+        // Clean markdown and isolate JSON block
+        text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
+        const firstBrace = text.indexOf('{');
+        const lastBrace = text.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            text = text.substring(firstBrace, lastBrace + 1);
+        }
+
         const parsed = JSON.parse(text);
 
         if (!parsed || !parsed.layers || parsed.layers.length !== 4) {
-            throw new Error("Invalid question generation response");
+            throw new Error("Invalid question generation response structure");
         }
 
         return parsed;
     } catch (error) {
-        console.error("Error generating validation questions:", error);
+        console.error("generateValidationQuestions error:", error.message);
         throw new Error("Failed to generate validation questions: " + error.message);
     }
 }

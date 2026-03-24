@@ -93,7 +93,7 @@ export default function AssessmentForm() {
                 const layerHistory = updatedHistory.filter(h => h.layerId === currentLayer.id);
                 const aiPromise = generateNextQuestion(currentLayer, layerHistory);
                 const timeoutPromise = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error("Timeout")), 10000)
+                    setTimeout(() => reject(new Error("Timeout")), 30000)
                 );
                 let nextQuestion = await Promise.race([aiPromise, timeoutPromise]);
                 if (!nextQuestion) nextQuestion = "Could you tell me more about that?";

@@ -11,19 +11,27 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "AI Career Pilot",
   description: "AI Career Coach design for users professional success",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: undefined,
+        variables: {
+          colorPrimary: "#000000",
+          colorTextOnPrimaryBackground: "#ffffff",
+        },
+        elements: {
+          formButtonPrimary: "bg-black hover:bg-gray-800 text-sm normal-case",
+          card: "shadow-none border border-border",
+        }
       }}
     >
       <html lang="en" suppressHydrationWarning>
-        <head>
-          <link rel="icon" href="/logo.jpeg" sizes="any" />
-        </head>
         <body className={`${inter.className}`}>
           <ThemeProvider
             attribute="class"

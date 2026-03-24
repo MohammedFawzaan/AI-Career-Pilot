@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/actions/user";
 import ValidationForm from "./_components/validation-form";
 
+export const maxDuration = 60; // Allow AI server actions up to 60s on Vercel
+
 export default async function ResumeValidationPage() {
     const user = await getUser();
 
