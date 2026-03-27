@@ -1,10 +1,13 @@
-# AI Career Pilot 🚀
+# <img src="public/logo.png" alt="Logo" width="45" align="center" style="margin-right: 8px;">AI Career Pilot 🚀
 
 ## 📌 Overview
 
 **AI Career Pilot** is a comprehensive, AI-powered platform designed to supercharge your career journey. By leveraging Google's Gemini LLM and advanced career assessment algorithms, it helps users discover their ideal career path, build professional resumes, generate tailored cover letters, find internships, and practice mock interviews with real-time AI feedback.
 
 Whether you are a student, a career switcher, or a professional looking to level up, this tool provides the personalized guidance you need to land your dream job.
+
+## 🌐 Live Demo
+Experience the platform live: [**AI Career Pilot on Vercel**](https://ai-career-pilot-ecru.vercel.app)
 
 ## ✨ Key Features
 
