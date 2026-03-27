@@ -25,8 +25,8 @@ export async function generateQuiz(customTopic = "") {
     throw new Error("No skills found. Please add skills to your profile or enter a custom topic below.");
   }
 
-  const topicContext = customTopic 
-    ? `the specific topic: "${customTopic}"` 
+  const topicContext = customTopic
+    ? `the specific topic: "${customTopic}"`
     : `their listed skills: ${user.skills.join(", ")}`;
 
   const prompt = `
@@ -80,10 +80,8 @@ export async function saveQuizResult(questions, answers, score) {
     explanation: q.explanation,
   }));
 
-  // Get wrong answers
   const wrongAnswers = questionResults.filter((q) => !q.isCorrect);
 
-  // Only generate improvement tips if there are wrong answers
   let improvementTip = null;
   if (wrongAnswers.length > 0) {
     const wrongQuestionsText = wrongAnswers
@@ -111,7 +109,6 @@ export async function saveQuizResult(questions, answers, score) {
       console.log(improvementTip);
     } catch (error) {
       console.error("Error generating improvement tip:", error);
-      // Continue without improvement tip if generation fails
     }
   }
 

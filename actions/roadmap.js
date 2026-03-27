@@ -32,7 +32,6 @@ export async function generateRoadmap(duration) {
             throw new Error("Please select a role at the career path page");
         }
 
-        // Generate AI roadmap
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
@@ -72,7 +71,6 @@ export async function generateRoadmap(duration) {
         const text = result.response.text().replace(/```json/g, "").replace(/```/g, "").trim();
         const roadmapData = JSON.parse(text);
 
-        // Initialize progress (all tasks unchecked)
         const progress = {};
         roadmapData.months.forEach(month => {
             month.tasks.forEach(task => {
@@ -80,7 +78,6 @@ export async function generateRoadmap(duration) {
             });
         });
 
-        // Save or update roadmap
         const roadmap = await db.careerRoadmap.upsert({
             where: { userId: user.id },
             update: {

@@ -9,7 +9,6 @@ export async function submitAssessmentFeedback(assessmentId, rating, comment, is
     if (!userId) throw new Error("Unauthorized");
 
     try {
-        // Verify the assessment belongs to the user
         const assessment = await db.careerAssessment.findUnique({
             where: { id: assessmentId },
             include: { user: true },
@@ -19,17 +18,14 @@ export async function submitAssessmentFeedback(assessmentId, rating, comment, is
             throw new Error("Assessment not found or unauthorized");
         }
 
-        // Check if feedback already exists
         const existingFeedback = await db.assessmentFeedback.findUnique({
             where: { assessmentId },
         });
 
         if (existingFeedback) {
-            // Feedback already submitted, cannot update
             throw new Error("Feedback has already been submitted and cannot be changed");
         }
 
-        // Create new feedback
         const feedback = await db.assessmentFeedback.create({
             data: {
                 assessmentId,
@@ -59,7 +55,6 @@ export async function getHappinessIndex() {
         const totalRating = feedbacks.reduce((sum, feedback) => sum + feedback.rating, 0);
         const averageRating = totalRating / feedbacks.length;
 
-        // Convert to percentage (5 stars = 100%)
         const happinessIndex = (averageRating / 5) * 100;
 
         return {

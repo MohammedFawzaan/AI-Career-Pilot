@@ -8,11 +8,8 @@ export default async function AssessmentPage() {
     const user = await getUser();
 
     if (!user) redirect("/sign-in");
-
-    // If an experienced user lands here by mistake, redirect them to their correct flow
-    if (user.userType === "EXPERIENCED") {
-        redirect("/onboarding/resume-validation");
-    }
+    if (!user.userType) redirect("/onboarding/selection");
+    if (user.userType !== "FRESHER") redirect("/onboarding/resume-upload");
 
     return (
         <main className="container mx-auto px-4 py-8 max-w-4xl">

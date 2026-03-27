@@ -7,7 +7,8 @@ import GameCognitiveIntelligence from "@/components/psych-games/GameCognitiveInt
 import GameFocusPrecision from "@/components/psych-games/GameFocusPrecision";
 import GameCuriosityLearning from "@/components/psych-games/GameCuriosityLearning";
 import { generatePsychGameContent } from "@/actions/psych-games";
-import { Brain, Crosshair, Sparkles, ChevronRight, Loader2, Zap, Target, TrendingUp } from "lucide-react";
+import { Brain, Crosshair, Sparkles, ChevronRight, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const GAMES_META = [
     { id: "cognitiveGame", title: "Cognitive Intelligence", icon: Brain, iconColor: "text-indigo-400", bgColor: "bg-indigo-500/10", borderColor: "border-indigo-500/20", gradientFrom: "from-indigo-500/20", tagline: "How sharp is your thinking?", description: "5 scenario-based rounds testing your analytical thinking, logical reasoning, and decision making.", duration: "~3 mins", tests: ["Analytical Thinking", "Logical Reasoning", "Problem Solving", "Decision Making"] },
@@ -37,6 +38,7 @@ export default function PsychGamesWrapper({ targetRole, onComplete }) {
                 setGameContent(content);
             } catch (err) {
                 console.error("Failed to generate game content:", err);
+                toast.error("Failed to generate assessment games. Please try again.");
                 setLoadError(true);
             } finally {
                 setLoadingContent(false);
@@ -308,6 +310,7 @@ export default function PsychGamesWrapper({ targetRole, onComplete }) {
                 <Button
                     onClick={() => {
                         setIsSubmitting(true);
+                        toast.loading("Analyzing your psych profile and creating career paths...");
                         onComplete({ psychScores: { cognitiveScore: scores.cognitiveIntelligence, focusScore: scores.focusPrecision, curiosityScore: scores.curiosityLearning, ...(roundDetails || {}) } });
                     }}
                     className="w-full"

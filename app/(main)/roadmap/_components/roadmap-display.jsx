@@ -67,16 +67,16 @@ export default function RoadmapDisplay({ roadmap }) {
                     return (
                         <Card key={index}>
                             <CardHeader>
-                                <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                     <div>
-                                        <CardTitle className="flex items-center gap-2">
+                                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                                             Month {month.month}: {month.title}
                                         </CardTitle>
                                         <CardDescription className="mt-2">
                                             {month.goals?.join(" • ")}
                                         </CardDescription>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="text-left sm:text-right shrink-0">
                                         <div className="text-sm text-muted-foreground">Progress</div>
                                         <div className="text-2xl font-bold text-blue-600">{monthProgress}%</div>
                                     </div>
@@ -97,10 +97,10 @@ export default function RoadmapDisplay({ roadmap }) {
                                             <Checkbox
                                                 checked={progress[task.id] || false}
                                                 onCheckedChange={(checked) => handleTaskToggle(task.id, checked)}
-                                                className="mt-1"
+                                                className="mt-1 shrink-0"
                                             />
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2">
                                                     <h5 className={`font-medium ${progress[task.id] ? "line-through text-muted-foreground" : ""}`}>
                                                         {task.title}
                                                     </h5>

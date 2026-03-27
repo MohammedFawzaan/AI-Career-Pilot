@@ -3,21 +3,26 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { generateRoadmap } from "@/actions/roadmap";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function DurationSelector({ currentDuration }) {
-    const [duration, setDuration] = useState(currentDuration || "3");
+    const [duration, setDuration] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleGenerate = async () => {
+        const selected = duration || currentDuration;
+        if (!selected) {
+            toast.error("Please select a duration first.");
+            return;
+        }
         setLoading(true);
         try {
-            await generateRoadmap(parseInt(duration));
-            toast.success("Roadmap generated successfully!");
+            await generateRoadmap(parseInt(selected));
+            toast.success(currentDuration ? "Roadmap regenerated!" : "Roadmap generated successfully!");
             router.refresh();
         } catch (error) {
             toast.error(error.message || "Failed to generate roadmap");
@@ -27,9 +32,9 @@ export default function DurationSelector({ currentDuration }) {
     };
 
     return (
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col min-[375px]:flex-row gap-3 items-start min-[375px]:items-center">
             <Select value={duration} onValueChange={setDuration}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full min-[375px]:w-[160px]">
                     <SelectValue placeholder="Select duration" />
                 </SelectTrigger>
                 <SelectContent>
@@ -38,14 +43,17 @@ export default function DurationSelector({ currentDuration }) {
                     <SelectItem value="12">12 Months</SelectItem>
                 </SelectContent>
             </Select>
-            <Button onClick={handleGenerate} disabled={loading}>
+            <Button onClick={handleGenerate} disabled={loading} className="w-full min-[375px]:w-auto">
                 {loading ? (
                     <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Generating...
                     </>
                 ) : (
-                    currentDuration ? "Regenerate" : "Generate Roadmap"
+                    <>
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        {currentDuration ? "Regenerate" : "Generate Roadmap"}
+                    </>
                 )}
             </Button>
         </div>

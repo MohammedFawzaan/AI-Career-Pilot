@@ -2,16 +2,14 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/actions/user";
 import ValidationForm from "./_components/validation-form";
 
-export const maxDuration = 60; // Allow AI server actions up to 60s on Vercel
+export const maxDuration = 60;
 
 export default async function ResumeValidationPage() {
     const user = await getUser();
 
     if (!user) redirect("/sign-in");
-
-    if (user.userType !== "EXPERIENCED") {
-        redirect("/onboarding/assessment");
-    }
+    if (!user.userType) redirect("/onboarding/selection");
+    if (user.userType !== "EXPERIENCED") redirect("/onboarding/assessment");
 
     return (
         <main className="container mx-auto px-4 py-8 max-w-4xl">

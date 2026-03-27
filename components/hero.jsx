@@ -39,11 +39,6 @@ const HeroSection = () => {
     <section className="w-full pt-36 md:pt-48 pb-10 relative overflow-hidden">
       <div className="space-y-6 text-center">
         <div className="space-y-6 mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary">
-            <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
-            AI-Powered Career Intelligence
-          </div>
 
           <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl xl:text-8xl gradient-title animate-gradient">
             Your AI Career Coach for

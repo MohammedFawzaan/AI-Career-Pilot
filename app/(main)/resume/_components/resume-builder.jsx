@@ -217,7 +217,7 @@ export default function ResumeBuilder({ initialContent }) {
         <h1 className="font-bold gradient-title text-5xl md:text-6xl">
           Resume Builder
         </h1>
-        <div className="space-x-2">
+        <div className="flex flex-wrap gap-2 justify-end">
           <Button variant="destructive" onClick={handleReset}>
             <RotateCcw className="mr-2 h-4 w-4" />
             Reset

@@ -6,13 +6,9 @@ export default async function ResumeUploadPage() {
     const user = await getUser();
 
     if (!user) redirect("/sign-in");
+    if (!user.userType) redirect("/onboarding/selection");
+    if (user.userType !== "EXPERIENCED") redirect("/onboarding/assessment");
 
-    // Only experienced users should be here
-    if (user.userType !== "EXPERIENCED") {
-        redirect("/onboarding/assessment");
-    }
-
-    // If user already has an assessment, they can still re-upload
     return (
         <main className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="space-y-4 mb-8">

@@ -130,7 +130,6 @@ export async function generateValidationQuestions(extractedResume) {
         const result = await model.generateContent(prompt);
         let text = result.response.text();
 
-        // Clean markdown and isolate JSON block
         text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
         const firstBrace = text.indexOf('{');
         const lastBrace = text.lastIndexOf('}');
@@ -304,10 +303,8 @@ export async function submitResumeValidation(resumeData, validationAnswers, targ
             throw new Error("Failed to analyze resume validation");
         }
 
-        // Mark analysis as experienced user type for differentiation
         analysis.userType = "EXPERIENCED";
 
-        // Upsert into CareerAssessment (same model as fresher)
         const assessment = await db.careerAssessment.upsert({
             where: { userId: user.id },
             update: {

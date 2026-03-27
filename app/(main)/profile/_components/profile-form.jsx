@@ -164,105 +164,101 @@ const ProfileForm = ({ industries, initialData }) => {
         }
 
         return (
-            <div className="w-full max-w-5xl mx-auto space-y-6">
-                {/* Header Card */}
-                <Card className="border-t-4 border-t-primary overflow-hidden shadow-lg">
-                    <CardContent className="p-0">
-                        <div className="bg-gradient-to-r from-muted/50 via-muted to-muted/20 h-24 sm:h-32"></div>
-                        <div className="px-6 pb-6 pt-0 flex flex-col sm:flex-row gap-6 items-start sm:items-end -mt-12 sm:-mt-16">
-                            <div className="h-24 w-24 sm:h-32 sm:w-32 bg-primary/10 rounded-full border-4 border-background flex items-center justify-center text-4xl shadow-md">
+            <div className="w-full max-w-4xl mx-auto px-2 py-4 sm:py-8">
+                {/* Header Section: Zero Background, Pure Typography & Iconography */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-16 px-2">
+                    <div className="flex flex-col md:flex-row items-center gap-8 group">
+                        <div className="relative">
+                            <div className="h-24 w-24 sm:h-32 sm:w-32 bg-primary text-primary-foreground rounded-[2rem] flex items-center justify-center text-4xl sm:text-5xl font-black shadow-lg rotate-6 group-hover:rotate-0 transition-all duration-500 ease-out">
                                 {initialData?.name?.charAt(0) || "U"}
                             </div>
-                            <div className="flex-1 space-y-1 pb-2">
-                                <h1 className="text-3xl font-bold gradient-title">
-                                    {initialData?.name || "Professional"}
-                                </h1>
-                                <p className="text-muted-foreground font-medium text-lg flex items-center gap-2">
-                                    <Briefcase className="h-4 w-4" />
-                                    {subIndustryName || industryName || "Professional"}
-                                </p>
+                            <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-white rounded-full border-4 border-primary flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+                                <Wand2 className="h-5 w-5 text-primary" />
                             </div>
-                            <Button className="mt-4 sm:mb-2 w-full sm:w-auto" onClick={() => setIsEditMode(true)}>
-                                Edit Profile
-                            </Button>
                         </div>
-                    </CardContent>
-                </Card>
+                        <div className="text-center md:text-left space-y-1">
+                            <h1 className="text-4xl sm:text-6xl font-black tracking-tighter text-foreground leading-none">
+                                {initialData?.name || "Professional"}
+                            </h1>
+                            <p className="text-lg sm:text-xl text-primary font-bold tracking-tight">
+                                {initialData?.email}
+                            </p>
+                        </div>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="lg"
+                        onClick={() => setIsEditMode(true)}
+                        className="text-primary font-black text-xl hover:bg-primary/5 rounded-none border-b-4 border-primary px-0 pb-1 h-auto"
+                    >
+                        EDIT PROFILE
+                    </Button>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Left Column: Bio & Skills */}
-                    <div className="md:col-span-2 space-y-6">
-                        <Card className="shadow-sm border-muted">
-                            <CardHeader>
-                                <CardTitle className="text-xl flex items-center gap-2">
-                                    <Building2 className="h-5 w-5 text-primary" />
-                                    Professional Summary
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-base leading-relaxed whitespace-pre-wrap text-muted-foreground">
-                                    {initialData?.bio || "No summary provided."}
-                                </p>
-                            </CardContent>
-                        </Card>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-16 px-2">
+                    {/* Primary Content Column */}
+                    <div className="md:col-span-2 space-y-16">
+                        {/* Summary Section: Pure Text focus */}
+                        <section className="relative">
+                            <div className="flex items-center gap-4 mb-6">
+                                <h2 className="text-2xl font-black tracking-tight text-foreground border-l-4 border-primary pl-4">Professional Narrative</h2>
+                            </div>
+                            <p className="text-xl sm:text-2xl leading-relaxed text-muted-foreground font-medium italic pl-4">
+                                {initialData?.bio || "No summary provided."}
+                            </p>
+                        </section>
 
-                        <Card className="shadow-sm border-muted">
-                            <CardHeader>
-                                <CardTitle className="text-xl flex items-center gap-2">
-                                    <Wand2 className="h-5 w-5 text-primary" />
-                                    Core Skills
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
+                        {/* Skills Section */}
+                        <section className="space-y-8">
+                            <h2 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-4">
+                                <div className="h-2 w-12 bg-primary" />
+                                Core Capabilities
+                            </h2>
+                            <div className="flex flex-wrap gap-4">
                                 {initialData?.skills?.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                        {initialData.skills.map((skill, index) => (
-                                            <Badge key={index} variant="secondary" className="px-3 py-1 text-sm bg-primary/10 hover:bg-primary/20 transition-colors">
-                                                {skill}
-                                            </Badge>
-                                        ))}
-                                    </div>
+                                    initialData.skills.map((skill, index) => (
+                                        <Badge
+                                            key={index}
+                                            variant="outline"
+                                            className="text-lg py-2.5 px-6 rounded-none border-2 border-primary text-primary bg-transparent font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-colors"
+                                        >
+                                            {skill}
+                                        </Badge>
+                                    ))
                                 ) : (
-                                    <p className="text-muted-foreground text-sm">No skills added yet.</p>
+                                    <p className="text-muted-foreground italic">No skills added yet.</p>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </section>
                     </div>
 
-                    {/* Right Column: Key Details */}
-                    <div className="space-y-6">
-                        <Card className="shadow-sm border-muted">
-                            <CardHeader>
-                                <CardTitle className="text-xl">Details</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-1.5 p-3 rounded-lg bg-muted/30">
-                                    <div className="flex items-center text-sm font-medium text-muted-foreground gap-2">
-                                        <GraduationCap className="h-4 w-4" />
-                                        Industry
+                    {/* Metadata Column: Colored Text and Accents, No BG Pills */}
+                    <div className="md:border-l-4 md:border-primary/10 md:pl-16 space-y-10">
+                        <section className="space-y-10">
+                            {[
+                                { label: "Current Status", value: initialData?.userType || "Fresher", icon: <GraduationCap className="h-5 w-5 text-blue-600" />, textColor: "text-blue-600" },
+                                { label: "Industry Focus", value: industryName || "—", icon: <Building2 className="h-5 w-5 text-purple-600" />, textColor: "text-purple-600" },
+                                { label: "Primary Role", value: initialData?.careerAssessment?.primaryRole, icon: <Briefcase className="h-5 w-5 text-emerald-600" />, textColor: "text-emerald-600" },
+                                { label: "Target Career", value: initialData?.careerAssessment?.targetRole, icon: <Wand2 className="h-5 w-5 text-amber-600" />, textColor: "text-amber-600" },
+                                { label: "Experience", value: `${initialData?.experience} Years`, icon: <Briefcase className="h-5 w-5 text-rose-600" />, textColor: "text-rose-600" },
+                                { label: "Location", value: initialData?.city && initialData?.country ? `${initialData.city}, ${initialData.country}` : initialData?.country || initialData?.city || "Not specified", icon: <MapPin className="h-5 w-5 text-indigo-600" />, textColor: "text-indigo-600" },
+                            ].map((item, idx) => (
+                                item.value && (
+                                    <div key={idx} className="space-y-2 group">
+                                        <div className="flex items-center gap-2">
+                                            {item.icon}
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{item.label}</p>
+                                        </div>
+                                        <p className={`text-2xl font-black leading-tight ${item.textColor} border-l-2 border-transparent group-hover:border-current pl-2 transition-all`}>
+                                            {item.value}
+                                        </p>
+                                        {idx === 1 && subIndustryName && (
+                                            <p className="text-sm font-bold text-muted-foreground/50 mt-1 uppercase tracking-wider ml-2">{subIndustryName}</p>
+                                        )}
                                     </div>
-                                    <p className="font-semibold text-foreground">{industryName}</p>
-                                </div>
-                                <div className="space-y-1.5 p-3 rounded-lg bg-muted/30">
-                                    <div className="flex items-center text-sm font-medium text-muted-foreground gap-2">
-                                        <Briefcase className="h-4 w-4" />
-                                        Experience
-                                    </div>
-                                    <p className="font-semibold text-foreground">{initialData?.experience} Years</p>
-                                </div>
-                                <div className="space-y-1.5 p-3 rounded-lg bg-muted/30">
-                                    <div className="flex items-center text-sm font-medium text-muted-foreground gap-2">
-                                        <MapPin className="h-4 w-4" />
-                                        Location
-                                    </div>
-                                    <p className="font-semibold text-foreground">
-                                        {initialData?.city && initialData?.country
-                                            ? `${initialData.city}, ${initialData.country}`
-                                            : initialData?.country || initialData?.city || "Not specified"}
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                )
+                            ))}
+                        </section>
                     </div>
                 </div>
             </div>

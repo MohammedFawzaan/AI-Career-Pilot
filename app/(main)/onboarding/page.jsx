@@ -3,26 +3,26 @@ import { industries } from "@/data/industries";
 import OnboardingForm from "./_components/onboarding-form";
 import { getUser } from "@/actions/user";
 
-export default async function OnboardingPage({ searchParams }) {
+export default async function OnboardingPage() {
   const user = await getUser();
+
+  if (!user) redirect("/sign-in");
 
   if (!user?.userType) {
     redirect("/onboarding/selection");
   }
 
-  if (user.industry) {
-    redirect("/profile");
+  // If assessment isn't done, force them back to their specific journey
+  if (!user.careerAssessment) {
+    if (user.userType === "EXPERIENCED") {
+      redirect("/onboarding/resume-upload");
+    } else {
+      redirect("/onboarding/assessment");
+    }
   }
 
-  const params = await searchParams;
-
-  // Experienced users without a selected role who navigate here directly
-  // (no query params from role selection) should go to resume upload
-  if (user.userType === "EXPERIENCED" && !user.careerAssessment?.primaryRole) {
-    const hasParams = params?.industry || params?.bio || params?.selectedRole;
-    if (!hasParams) {
-      redirect("/onboarding/resume-upload");
-    }
+  if (user.industry) {
+    redirect("/profile");
   }
 
   return (

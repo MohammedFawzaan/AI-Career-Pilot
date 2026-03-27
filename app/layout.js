@@ -43,12 +43,6 @@ export default function RootLayout({ children }) {
             <Header />
             <main className="min-h-screen">{children}</main>
             <Toaster richColors />
-
-            <footer className="bg-gray-300 py-12">
-              <div className="container mx-auto px-4 text-center text-black font-bold">
-                <p>Made with 💗 by Mohammed Fawzaan & Team</p>
-              </div>
-            </footer>
           </ThemeProvider>
         </body>
       </html>

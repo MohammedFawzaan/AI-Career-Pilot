@@ -174,8 +174,7 @@ export async function submitAssessment(fullProfile, targetRole = null, psychScor
 
         const result = await model.generateContent(prompt);
         let text = result.response.text();
-        
-        // Clean markdown and isolate JSON block
+
         text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
         const firstBrace = text.indexOf('{');
         const lastBrace = text.lastIndexOf('}');

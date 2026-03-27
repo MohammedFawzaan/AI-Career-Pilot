@@ -11,17 +11,26 @@ import Link from "next/link";
 import RoleCard from "./_components/role-card";
 import FeedbackForm from "./_components/feedback-form";
 import FeedbackStats from "./_components/feedback-stats";
+import Footer from "@/components/footer";
 
 export default async function AssessmentResultPage() {
     const user = await getUser();
     if (!user) redirect("/sign-in");
 
-    const assessment = await db.careerAssessment.findUnique({
-        where: { userId: user.id },
-        include: { feedback: true },
-    });
+    // Unified Onboarding Guard System
+    if (!user.userType) {
+        redirect("/onboarding/selection");
+    }
 
-    if (!assessment) redirect("/onboarding/selection");
+    // If assessment isn't done, force them back
+    const assessment = await db.careerAssessment.findUnique({ where: { userId: user.id }, include: { feedback: true } });
+    if (!assessment) {
+        if (user.userType === "EXPERIENCED") {
+            redirect("/onboarding/resume-upload");
+        } else {
+            redirect("/onboarding/assessment");
+        }
+    }
 
     const { analysis } = assessment;
     const isExperienced = analysis.userType === "EXPERIENCED";
@@ -48,8 +57,8 @@ export default async function AssessmentResultPage() {
         : null;
 
     return (
-        <main className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 py-10 max-w-6xl space-y-12">
+        <>
+            <div className="container mx-auto px-4 pt-10 pb-4 max-w-6xl space-y-12">
                 {/* Header */}
                 <div className="space-y-3 text-center">
                     <h1 className="gradient-title text-4xl md:text-5xl font-bold">
@@ -63,13 +72,16 @@ export default async function AssessmentResultPage() {
                 </div>
 
                 {/* Primary Profile Card */}
-                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-primary/10 shrink-0">
-                        <Trophy className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-primary">{analysis.primaryProfile}</p>
-                        <p className="text-foreground/80 mt-1">{analysis.summary}</p>
+                <div className="flex items-stretch gap-0 rounded-2xl border border-border overflow-hidden shadow-sm bg-card">
+                    <div className="w-1.5 shrink-0 bg-gradient-to-b from-primary via-primary/60 to-transparent" />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 sm:px-5 py-4 flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
+                            <p className="text-base sm:text-xl font-bold text-foreground flex items-center gap-1.5 flex-wrap">
+                                <Trophy className="h-4 w-4 text-primary shrink-0" />
+                                {analysis.primaryProfile}
+                            </p>
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">{analysis.summary}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -425,7 +437,7 @@ export default async function AssessmentResultPage() {
                 </section>
 
                 {/* ── FOOTER ACTIONS ── */}
-                <div className="flex justify-between items-center pb-8">
+                <div className="flex justify-between items-center">
                     <Button asChild variant="outline" size="sm" className="rounded-xl">
                         <Link href={isExperienced ? "/onboarding/resume-upload" : "/onboarding/assessment"}>
                             <RefreshCw className="mr-2 h-4 w-4" />
@@ -434,7 +446,8 @@ export default async function AssessmentResultPage() {
                     </Button>
                 </div>
             </div>
-        </main>
+            <Footer />
+        </>
     );
 }
 

@@ -1,17 +1,25 @@
 import React from "react";
 import {
-  ArrowRight,
   Sparkles,
   Target,
   TrendingUp,
   Route,
+  Users,
+  Zap,
+  Award,
+  Infinity,
 } from "lucide-react";
 import HeroSection from "@/components/hero";
 import { howItWorks } from "@/data/howItWorks";
 import { features } from "@/data/features";
 import { CTAButton } from "@/components/cta-button";
+import Footer from "@/components/footer";
 
-export default function LandingPage() {
+import { db } from "@/lib/prisma";
+
+export default async function LandingPage() {
+  const userCount = await db.user.count();
+
   return (
     <>
       <div className="grid-background"></div>
@@ -23,9 +31,6 @@ export default function LandingPage() {
       <section id="features" className="w-full py-16 md:py-24 lg:py-32 bg-background">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-2">
-              Project Modules
-            </p>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Comprehensive Career Development System
             </h2>
@@ -94,80 +99,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Choose AI Career Pilot — Stitch 2-Column Layout */}
+      {/* Why Choose AI Career Pilot — 2-Column Layout */}
       <section className="w-full py-16 md:py-24 bg-muted/50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
-            {/* Left Visual */}
-            <div className="relative group cursor-pointer" style={{ perspective: '1000px' }}>
-              {/* Outer Glow */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary via-purple-600 to-blue-500 rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition duration-1000"></div>
 
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl h-[400px] bg-slate-950 border border-white/10 transform transition-all duration-700 group-hover:scale-[1.02] group-hover:-rotate-2">
-
-                {/* Dynamic Background Gradients */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-purple-500/20 z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100"></div>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 animate-pulse" style={{ animationDelay: "1s" }}></div>
-
-                {/* Animated Decorative Grid */}
-                <div className="absolute inset-0 z-[5] opacity-20 transition-opacity duration-500 group-hover:opacity-40">
-                  <div className="absolute inset-0 grid-move-bg"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)",
-                      backgroundSize: "40px 40px",
-                    }}
-                  ></div>
-                </div>
-
-                {/* Floating "Data Nodes" */}
-                <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_theme(colors.primary.DEFAULT)] animate-bounce" style={{ animationDuration: "2.5s" }}></div>
-                <div className="absolute top-2/3 right-1/3 w-3 h-3 bg-purple-400 rounded-full shadow-[0_0_15px_theme(colors.purple.400)] animate-pulse" style={{ animationDuration: "3s" }}></div>
-                <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-blue-400 rounded-full shadow-[0_0_10px_theme(colors.blue.400)] animate-ping" style={{ animationDuration: "4s" }}></div>
-
-                {/* Scanning Laser Line */}
-                <div className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent z-10 opacity-60 shadow-[0_0_10px_theme(colors.primary.DEFAULT)] scan-line-anim"></div>
-
-                {/* Inline CSS for Custom Animations entirely isolated here */}
-                <style dangerouslySetInnerHTML={{
-                  __html: `
-                  @keyframes grid-move {
-                    0% { background-position: 0 0; }
-                    100% { background-position: 40px 40px; }
-                  }
-                  .grid-move-bg {
-                    animation: grid-move 15s linear infinite;
-                  }
-                  @keyframes scan {
-                    0% { top: -10%; opacity: 0; }
-                    10% { opacity: 1; }
-                    40% { top: 110%; opacity: 1; }
-                    50% { opacity: 0; }
-                    100% { top: 110%; opacity: 0; }
-                  }
-                  .scan-line-anim {
-                    animation: scan 6s ease-in-out infinite;
-                  }
-                `}} />
-
-                {/* Content Card overlay */}
-                <div className="absolute inset-0 flex flex-col justify-end p-6 z-20">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary shadow-lg shadow-primary/40 mb-4 transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <p className="text-white text-lg md:text-xl font-medium leading-relaxed">
-                    Empowering the next generation to bridge the gap between academic theory and the high-velocity demands of the AI-driven workforce.
-                  </p>
-                  <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between group/link">
-                    <p className="text-sm font-bold text-purple-200 uppercase tracking-wider group-hover/link:text-purple-400 transition-colors">Our Core Mission</p>
-                    <ArrowRight className="w-5 h-5 text-primary group-hover:translate-x-2 group-hover/link:text-purple-400 transition-all duration-300" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Content */}
+            {/* Left Content (text) */}
             <div>
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Why This Web-App Matters
@@ -222,13 +159,44 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+
+            {/* Right Visual — Stats Grid */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xl font-bold tracking-tight">Platform at a Glance</h3>
+                <p className="text-sm text-muted-foreground mt-1">Real facts about what AI Career Pilot delivers.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { icon: Zap, value: "95%", label: "AI Career Match Accuracy", sub: "Based on psychometric + skill analysis", color: "text-yellow-500", bg: "bg-yellow-500/10" },
+                  { icon: Infinity, value: "∞", label: "Unique Career Paths", sub: "Every path is AI-generated based on your career assessment", color: "text-green-500", bg: "bg-green-500/10" },
+                  { icon: Award, value: "8-Step", label: "Structured Journey", sub: "From assessment to job-ready", color: "text-purple-500", bg: "bg-purple-500/10" },
+                  { icon: Users, value: userCount.toLocaleString() + "+", label: "Active Users", sub: "Growing community of students and professionals", color: "text-blue-500", bg: "bg-blue-500/10" },
+                ].map(({ icon: Icon, value, label, sub, color, bg }) => (
+                  <div
+                    key={label}
+                    className="group rounded-2xl border border-border bg-card p-5 flex flex-col gap-3 hover:border-primary/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${bg}`}>
+                      <Icon className={`h-5 w-5 ${color}`} />
+                    </div>
+                    <div>
+                      <p className={`text-2xl font-extrabold tracking-tight ${color}`}>{value}</p>
+                      <p className="text-sm font-semibold mt-0.5">{label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* CTA Section — Dark with Blur Effects from Stitch */}
+      {/* CTA Section — Dark with Blur Effects */}
       <section className="w-full relative overflow-hidden">
-        <div className="relative py-24 bg-[#131022]">
+        <div className="relative py-24 bg-[#131022] rounded-tl-3xl rounded-tr-3xl">
           {/* Background Glow Effects */}
           <div className="absolute inset-0 opacity-20 pointer-events-none">
             <div className="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full blur-[128px]"></div>
@@ -248,6 +216,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </>
   );
 }

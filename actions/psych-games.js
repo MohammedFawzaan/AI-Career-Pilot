@@ -3,15 +3,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-/**
- * Generates content for all 3 psychological assessment games.
- * Each game uses a DIFFERENT evaluation technique:
- *   1. Cognitive: Weighted Single Selection (pick best action, scored 100/70/40/10)
- *   2. Focus: Correct Identification (find the ONE correct claim among 3 wrong ones)
- *   3. Curiosity: Priority Ranking (rank learning approaches, compared to expert order)
- *
- * Scoring is done IN-CODE, not by AI.
- */
 export async function generatePsychGameContent(context) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -158,7 +149,7 @@ export async function generatePsychGameContent(context) {
         if (firstBrace !== -1 && lastBrace !== -1) {
             text = text.substring(firstBrace, lastBrace + 1);
         }
-        
+
         const parsed = JSON.parse(text);
 
         if (

@@ -7,14 +7,11 @@ import { unstable_cache } from "next/cache";
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = "jsearch.p.rapidapi.com";
 
-// Cache internships for 1 hour to reduce API calls
 const getCachedInternships = unstable_cache(
     async (userId, primaryRole, city, country) => {
         const hasLocation = country && city;
 
-        // Make API calls in parallel for faster loading
         const [localResults, remoteResults] = await Promise.all([
-            // Fetch local internships if user has location
             hasLocation ? (async () => {
                 const locationQuery = [primaryRole, "internship", city, country]
                     .filter(Boolean)
@@ -53,7 +50,7 @@ const getCachedInternships = unstable_cache(
                                 location: job.job_city && job.job_country
                                     ? `${job.job_city}, ${job.job_country}`
                                     : job.job_country || "Remote",
-                                description: job.job_description?.substring(0, 200) + "..." || "No description available",
+                                description: (job.job_description || "No description available.").substring(0, 200) + "...",
                                 applyLink: job.job_apply_link,
                                 postedDate: job.job_posted_at_datetime_utc,
                                 employmentType: job.job_employment_type,
@@ -66,7 +63,6 @@ const getCachedInternships = unstable_cache(
                 return [];
             })() : Promise.resolve([]),
 
-            // Fetch remote internships
             (async () => {
                 const remoteUrl = `https://${RAPIDAPI_HOST}/search?query=${encodeURIComponent(primaryRole + " remote internship")}&page=1&num_pages=1&date_posted=month`;
 
@@ -100,7 +96,7 @@ const getCachedInternships = unstable_cache(
                                 title: job.job_title,
                                 company: job.employer_name,
                                 location: "Remote",
-                                description: job.job_description?.substring(0, 200) + "..." || "No description available",
+                                description: (job.job_description || "No description available.").substring(0, 200) + "...",
                                 applyLink: job.job_apply_link,
                                 postedDate: job.job_posted_at_datetime_utc,
                                 employmentType: job.job_employment_type,
@@ -114,7 +110,6 @@ const getCachedInternships = unstable_cache(
             })()
         ]);
 
-        // Return combined results
         return {
             local: localResults,
             remote: remoteResults,
@@ -123,7 +118,7 @@ const getCachedInternships = unstable_cache(
     },
     ["internships"],
     {
-        revalidate: 3600, // Cache for 1 hour (3600 seconds)
+        revalidate: 3600,
         tags: ["internships"],
     }
 );
@@ -150,7 +145,6 @@ export async function fetchInternships() {
 
         const primaryRole = user.careerAssessment.primaryRole;
 
-        // Use cached function
         return await getCachedInternships(
             userId,
             primaryRole,
@@ -168,7 +162,6 @@ export async function fetchCertificates() {
     if (!userId) throw new Error("Unauthorized");
 
     try {
-        // Get user's career assessment to find recommendedSkills
         const user = await db.user.findUnique({
             where: { clerkUserId: userId },
             include: {
@@ -183,12 +176,10 @@ export async function fetchCertificates() {
         const rawSkills = user.careerAssessment.analysis.recommendedSkills;
         const recommendedSkills = rawSkills.map(s => typeof s === 'string' ? s : s.skill).filter(Boolean);
 
-        // Take first 2-3 skills to avoid too many API calls
         const topSkills = recommendedSkills.slice(0, 2);
 
         const allCertificates = [];
 
-        // Fetch certificates for each skill
         for (const skill of topSkills) {
             const url = `https://${RAPIDAPI_HOST}/search?query=${encodeURIComponent(skill + " certification course")}&page=1&num_pages=1`;
 
@@ -203,7 +194,6 @@ export async function fetchCertificates() {
             if (response.ok) {
                 const data = await response.json();
 
-                // Filter for certification/course related positions
                 const certs = (data.data || [])
                     .filter(job => {
                         const title = job.job_title?.toLowerCase() || "";
@@ -216,7 +206,7 @@ export async function fetchCertificates() {
                             description.includes("course")
                         );
                     })
-                    .slice(0, 3) // Limit per skill
+                    .slice(0, 3)
                     .map(job => ({
                         id: job.job_id,
                         title: job.job_title,
@@ -230,15 +220,13 @@ export async function fetchCertificates() {
             }
         }
 
-        // If no results from job search, return popular certifications as fallback
         if (allCertificates.length === 0) {
             return getPopularCertifications(recommendedSkills);
         }
 
-        return allCertificates.slice(0, 10); // Limit total results
+        return allCertificates.slice(0, 10);
     } catch (error) {
         console.error("Error fetching certificates:", error);
-        // Return popular certifications as fallback
         const user = await db.user.findUnique({
             where: { clerkUserId: userId },
             include: { careerAssessment: true },
@@ -247,7 +235,6 @@ export async function fetchCertificates() {
     }
 }
 
-// Fallback function to provide popular certifications
 function getPopularCertifications(skills) {
     const certMap = {
         "JavaScript": [
@@ -275,7 +262,6 @@ function getPopularCertifications(skills) {
     const recommendations = [];
 
     skills.forEach((skill, index) => {
-        // Try to find exact match or partial match
         const matchingKey = Object.keys(certMap).find(key =>
             skill.toLowerCase().includes(key.toLowerCase()) ||
             key.toLowerCase().includes(skill.toLowerCase())
@@ -295,7 +281,6 @@ function getPopularCertifications(skills) {
         }
     });
 
-    // If still no matches, provide general certifications
     if (recommendations.length === 0) {
         return [
             {

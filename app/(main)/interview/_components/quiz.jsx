@@ -17,12 +17,16 @@ import { generateQuiz, saveQuizResult } from "@/actions/interview";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
 import { BarLoader } from "react-spinners";
+import { AlertCircle } from "lucide-react";
+import Link from "next/link";
 
-export default function Quiz() {
+export default function Quiz({ user }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [customTopic, setCustomTopic] = useState("");
+
+  const hasSkills = user?.skills?.length > 0;
 
   const {
     loading: generatingQuiz,
@@ -106,25 +110,42 @@ export default function Quiz() {
           <CardTitle>Ready to test your knowledge?</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            This quiz contains 10 questions specific to your industry and
-            skills. Take your time and choose the best answer for each question.
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
+            Questions are generated strictly based on your profile skills or a custom topic.
           </p>
+
+          {!hasSkills && !customTopic && (
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div className="text-sm sm:text-base md:text-lg">
+                <p className="font-medium text-amber-800">No Skills Found</p>
+                <p className="text-amber-700">
+                  Please <Link href="/profile" className="underline font-semibold">add skills to your profile</Link> or enter a custom topic below to generate questions.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
-            <Label htmlFor="customTopic">Generate questions about a specific topic (Optional)</Label>
-            <Input 
+            <Label htmlFor="customTopic" className="font-semibold">Custom Topic (Manual Entry)</Label>
+            <Input
               id="customTopic"
-              placeholder="e.g. React Hooks, AWS Networking, Next.js App Router" 
+              placeholder="e.g. Next.js, Java Streams, Project Management"
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
+              className="bg-background border-primary/20 focus-visible:ring-primary"
             />
             <p className="text-xs text-muted-foreground">
-              If left blank, questions will be generated ONLY based on the skills listed in your profile.
+              If left blank, questions will be generated ONLY based on your {user?.skills?.length || 0} skills listed in your profile.
             </p>
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={() => generateQuizFn(customTopic)} className="w-full">
+          <Button
+            onClick={() => generateQuizFn(customTopic)}
+            className="w-full"
+            disabled={!hasSkills && !customTopic}
+          >
             Start Quiz
           </Button>
         </CardFooter>
@@ -142,7 +163,7 @@ export default function Quiz() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-lg font-medium">{question.question}</p>
+        <p className="text-sm sm:text-base md:text-lg font-medium">{question.question}</p>
         <RadioGroup
           onValueChange={handleAnswer}
           value={answers[currentQuestion]}
@@ -151,7 +172,7 @@ export default function Quiz() {
           {question.options.map((option, index) => (
             <div key={index} className="flex items-center space-x-2">
               <RadioGroupItem value={option} id={`option-${index}`} />
-              <Label htmlFor={`option-${index}`}>{option}</Label>
+              <Label htmlFor={`option-${index}`} className="text-sm sm:text-base md:text-lg">{option}</Label>
             </div>
           ))}
         </RadioGroup>

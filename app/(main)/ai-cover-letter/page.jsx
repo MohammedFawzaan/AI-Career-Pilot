@@ -9,14 +9,31 @@ import { redirect } from "next/navigation";
 export default async function CoverLetterPage() {
   const user = await getUser();
   if (!user) redirect("/sign-in");
-  if (!user?.userType) redirect("/onboarding/selection");
+
+  if (!user.userType) {
+    redirect("/onboarding/selection");
+  }
+
+  // If assessment isn't done, force them back
+  if (!user.careerAssessment) {
+    if (user.userType === "EXPERIENCED") {
+      redirect("/onboarding/resume-upload");
+    } else {
+      redirect("/onboarding/assessment");
+    }
+  }
+
+  // Final onboarding
+  if (!user.industry) {
+    redirect("/onboarding");
+  }
 
   const coverLetters = await getCoverLetters();
 
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col md:flex-row gap-2 items-center justify-between mb-5">
-        <h1 className="text-6xl font-bold gradient-title">My Cover Letters</h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold gradient-title">My Cover Letters</h1>
         <Link href="/ai-cover-letter/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />

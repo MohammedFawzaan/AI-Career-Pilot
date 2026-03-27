@@ -3,14 +3,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-/**
- * Generate 7 questions to evaluate whether the user is CAPABLE OF LEARNING
- * their targeted role/domain — using Section 1 assessment context to personalize.
- *
- * @param {string} targetRole - The user's desired target role or domain
- * @param {Array} section1Context - Summary of Section 1 answers for context
- * @returns {{ questions: string[] }}
- */
 export async function generateRoleFitQuestions(targetRole, section1Context = []) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -18,7 +10,6 @@ export async function generateRoleFitQuestions(targetRole, section1Context = [])
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    // Build a brief summary of Section 1 for context
     const section1Summary = section1Context.length > 0
         ? `
         Here is a brief summary of the user's background from their career assessment:
@@ -74,11 +65,9 @@ export async function generateRoleFitQuestions(targetRole, section1Context = [])
 
     try {
         const result = await model.generateContent(prompt);
-        // More robust JSON extraction to handle various markdown artifacts
         let text = result.response.text();
         text = text.replace(/```(json|JSON)?\n?/g, "").replace(/```/g, "").trim();
 
-        // Try to extract just the JSON part if there is any stray text
         const firstBrace = text.indexOf('{');
         const lastBrace = text.lastIndexOf('}');
         if (firstBrace !== -1 && lastBrace !== -1) {

@@ -9,7 +9,9 @@ Whether you are a student, a career switcher, or a professional looking to level
 ## ✨ Key Features
 
 ### 🎯 Career Assessment & Path Selection
-- **Intelligent Career Assessment**: Multi-layered AI-powered assessment that analyzes your skills, interests, and experience
+- **Intelligent Career Assessment**: Multi-layered AI-powered assessment with dedicated flows:
+  - **For Students/Freshers**: Career discovery assessment (dynamic questionnaires) ➔ Role targeting assessment ➔ Psychological assessment.
+  - **For Experienced Users**: Resume upload ➔ Resume validation assessment ➔ Role targeting assessment ➔ Psychological assessment.
 - **Personalized Role Recommendations**: Get top 3 career roles tailored to your profile with detailed match reasoning
 - **Career Path Selection**: Choose your ideal career path with AI-suggested industry, skills, and bio
 - **Country Recommendations**: Discover the best countries for your chosen career path
@@ -98,24 +100,24 @@ Follow these steps to set up the project locally.
    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/onboarding/selection
    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding/selection
 
-   # AI API Key (Google Gemini)
+   # Artificial Intelligence
    GEMINI_API_KEY=AIzaSy...
 
-   # Job Search API (RapidAPI - JSearch)
+   # Job Data
    RAPIDAPI_KEY=your_rapidapi_key_here
 
-   # Background Jobs (Inngest)
+   # Background Jobs
    INNGEST_EVENT_KEY=your_inngest_event_key
    INNGEST_SIGNING_KEY=your_inngest_signing_key
    ```
 
-4. **Initialize the Database:**
+4. **Initialize Database:**
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
-5. **Run the Development Server:**
+5. **Launch Dev Server:**
    ```bash
    npm run dev
    ```
@@ -232,18 +234,17 @@ For more detailed information, check out the `docs/` folder:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
+We welcome contributions to make AI Career Pilot even smarter!
 1. Fork the project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b feature/NextGenFeature`)
+3. Commit your Changes (`git commit -m 'Add NextGenFeature'`)
+4. Push to the Branch (`git push origin feature/NextGenFeature`)
 5. Open a Pull Request
-
-## 📄 License
-
-Author - Mohammed Fawzaan
 
 ---
 
-**Built with ❤️ using Next.js, React, and Google Gemini AI**
+## 📄 License & Author
+
+**Author:** Mohammed Fawzaan
+
+*Built with ❤️, Next.js, and Google Gemini.*
