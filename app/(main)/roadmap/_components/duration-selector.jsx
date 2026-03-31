@@ -52,7 +52,7 @@ export default function DurationSelector({ currentDuration }) {
                 ) : (
                     <>
                         <RefreshCw className="mr-2 h-4 w-4" />
-                        {currentDuration ? "Regenerate" : "Generate Roadmap"}
+                        {currentDuration ? "Regenerate" : "Generate"}
                     </>
                 )}
             </Button>

@@ -3,8 +3,9 @@ import { industries } from "@/data/industries";
 import OnboardingForm from "./_components/onboarding-form";
 import { getUser } from "@/actions/user";
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({ searchParams }) {
   const user = await getUser();
+  const params = await searchParams;
 
   if (!user) redirect("/sign-in");
 
@@ -21,7 +22,9 @@ export default async function OnboardingPage() {
     }
   }
 
-  if (user.industry) {
+  const isReselecting = !!params?.selectedRole;
+
+  if (user.industry && !isReselecting) {
     redirect("/profile");
   }
 

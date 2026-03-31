@@ -206,6 +206,7 @@ export default async function AssessmentResultPage() {
                                         role={analysis.targetRoleCareerPath}
                                         analysis={analysis}
                                         selectedRole={assessment.primaryRole}
+                                        userIndustry={user.industry}
                                     />
                                 </div>
 
@@ -275,6 +276,7 @@ export default async function AssessmentResultPage() {
                                 index={index}
                                 analysis={analysis}
                                 selectedRole={assessment.primaryRole}
+                                userIndustry={user.industry}
                             />
                         ))}
                     </div>

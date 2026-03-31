@@ -6,14 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { onboardingSchema } from "@/app/lib/schema";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Briefcase, MapPin, Wrench, FileText } from "lucide-react";
 import { updateUser } from "@/actions/user";
 import { Badge } from "@/components/ui/badge";
 
@@ -103,14 +102,27 @@ export default function OnboardingForm({ industries }) {
   };
 
   return (
-    <div className="flex items-center justify-center bg-background">
-      <Card className="w-full max-w-lg mt-10 mx-2">
-        <CardHeader>
-          <CardTitle className="gradient-title text-4xl">Complete Your Profile</CardTitle>
-          <CardDescription>Select your industry to get personalized insights.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <div className="w-full px-4 sm:px-0">
+      {/* Header */}
+      <div className="mb-12 space-y-2">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+          Complete Your Profile
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Select your industry and fill in your details to get personalized career insights.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+        {/* Section: Professional Details */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Briefcase className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold tracking-tight text-foreground">Professional Details</h2>
+          </div>
+          <div className="border-t border-border/60" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="industry">Industry <span className="text-red-500">*</span></Label>
               <Select
@@ -121,7 +133,7 @@ export default function OnboardingForm({ industries }) {
                 }}
                 value={watchIndustry}
               >
-                <SelectTrigger id="industry">
+                <SelectTrigger id="industry" className={errors.industry ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select an industry" />
                 </SelectTrigger>
                 <SelectContent>
@@ -142,7 +154,7 @@ export default function OnboardingForm({ industries }) {
                   onValueChange={(value) => setValue("subIndustry", value)}
                   value={watch("subIndustry")}
                 >
-                  <SelectTrigger id="subIndustry">
+                  <SelectTrigger id="subIndustry" className={errors.subIndustry ? "border-red-500" : ""}>
                     <SelectValue placeholder="Select your specialization" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,16 +177,29 @@ export default function OnboardingForm({ industries }) {
                 min="0"
                 max="50"
                 placeholder="Enter years of experience"
+                className={errors.experience ? "border-red-500" : ""}
                 {...register("experience")}
               />
               {errors.experience && <p className="text-sm text-red-500">{errors.experience.message}</p>}
             </div>
+          </div>
+        </section>
 
+        {/* Section: Location */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <MapPin className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold tracking-tight text-foreground">Location</h2>
+          </div>
+          <div className="border-t border-border/60" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="country">Country <span className="text-red-500">*</span></Label>
               <Input
                 id="country"
-                placeholder="e.g., United States, India, United Kingdom"
+                placeholder="e.g., United States, India"
+                className={errors.country ? "border-red-500" : ""}
                 {...register("country")}
               />
               <p className="text-xs text-muted-foreground">Helps find local internships</p>
@@ -185,67 +210,90 @@ export default function OnboardingForm({ industries }) {
               <Label htmlFor="city">City <span className="text-red-500">*</span></Label>
               <Input
                 id="city"
-                placeholder="e.g., New York, Bangalore, London"
+                placeholder="e.g., New York, Bangalore"
+                className={errors.city ? "border-red-500" : ""}
                 {...register("city")}
               />
               <p className="text-xs text-muted-foreground">Helps find local internships</p>
               {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
             </div>
+          </div>
+        </section>
 
-            <div className="space-y-2">
-              <Label htmlFor="skills">Skills <span className="text-red-500">*</span></Label>
-              <Input
-                id="skills"
-                placeholder="e.g., Python, JavaScript, Project Management"
-                {...register("skills")}
-              />
+        {/* Section: Skills & Bio */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Wrench className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold tracking-tight text-foreground">Skills</h2>
+          </div>
+          <div className="border-t border-border/60" />
 
-              {recommendedSkills.length > 0 && (
-                <div className="mt-2 text-sm text-muted-foreground">
-                  <p className="mb-1">Recommended for chosen career path:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {recommendedSkills.map((skill) => (
-                      <Badge
-                        key={skill}
-                        variant="outline"
-                        className="cursor-pointer hover:bg-primary/10 transition-colors flex items-center gap-1"
-                        onClick={() => handleAddSkill(skill)}
-                      >
-                        <Plus className="h-3 w-3" /> {skill}
-                      </Badge>
-                    ))}
-                  </div>
+          <div className="space-y-2">
+            <Label htmlFor="skills">Your Skills <span className="text-red-500">*</span></Label>
+            <Input
+              id="skills"
+              placeholder="e.g., Python, JavaScript, Project Management"
+              className={errors.skills ? "border-red-500" : ""}
+              {...register("skills")}
+            />
+
+            {recommendedSkills.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs text-muted-foreground font-medium mb-2">Recommended for your career path:</p>
+                <div className="flex flex-wrap gap-2">
+                  {recommendedSkills.map((skill) => (
+                    <Badge
+                      key={skill}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-primary/10 transition-colors flex items-center gap-1"
+                      onClick={() => handleAddSkill(skill)}
+                    >
+                      <Plus className="h-3 w-3" /> {skill}
+                    </Badge>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              <p className="text-xs text-muted-foreground mt-2">Separate multiple skills with commas</p>
-              {errors.skills && <p className="text-sm text-red-500">{errors.skills.message}</p>}
-            </div>
+            <p className="text-xs text-muted-foreground mt-2">Separate multiple skills with commas</p>
+            {errors.skills && <p className="text-sm text-red-500">{errors.skills.message}</p>}
+          </div>
+        </section>
 
-            <div className="space-y-2">
-              <Label htmlFor="bio">Professional Bio <span className="text-red-500">*</span></Label>
-              <Textarea
-                id="bio"
-                placeholder="Tell us about your professional background..."
-                className="h-32"
-                {...register("bio")}
-              />
-              {errors.bio && <p className="text-sm text-red-500">{errors.bio.message}</p>}
-            </div>
+        {/* Section: Bio */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <FileText className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-bold tracking-tight text-foreground">Professional Bio</h2>
+          </div>
+          <div className="border-t border-border/60" />
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Complete Profile"
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          <div className="space-y-2">
+            <Label htmlFor="bio">Tell us about yourself <span className="text-red-500">*</span></Label>
+            <Textarea
+              id="bio"
+              placeholder="Tell us about your professional background..."
+              className={`h-32 ${errors.bio ? "border-red-500" : ""}`}
+              {...register("bio")}
+            />
+            {errors.bio && <p className="text-sm text-red-500">{errors.bio.message}</p>}
+          </div>
+        </section>
+
+        {/* Submit */}
+        <div className="pt-4">
+          <Button type="submit" className="w-full sm:w-auto sm:min-w-[200px]" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Complete Profile"
+            )}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

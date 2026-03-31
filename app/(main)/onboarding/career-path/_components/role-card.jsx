@@ -17,14 +17,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { updatePrimaryRole } from "@/actions/user";
 import { useRouter } from "next/navigation";
+import { industries } from "@/data/industries";
 
-export default function RoleCard({ role, index, analysis, selectedRole }) {
+export default function RoleCard({ role, index, analysis, selectedRole, userIndustry }) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const isCurrentPath = selectedRole === role.role;
 
     const handleSelectPath = async () => {
         setLoading(true);
+        const toastId = toast.loading("Preparing your flight...", {
+            description: `Setting course for ${role.role}...`,
+        });
+
         try {
             await updatePrimaryRole(role.role);
 
@@ -37,9 +42,24 @@ export default function RoleCard({ role, index, analysis, selectedRole }) {
                 ? `I am an experienced professional looking to grow into ${role.role}. ${analysis.summary}`
                 : `I am aspiring to be a ${role.role}. ${analysis.summary}`;
 
-            router.replace(`/onboarding?industry=&skills=${encodeURIComponent(skillsStr)}&bio=${encodeURIComponent(bio)}&selectedRole=${encodeURIComponent(role.role)}`);
-        } catch {
-            toast.error("Failed to select role. Please try again.");
+            // Parse userIndustry slug back to sub-industry name for preselection
+            let subIndustryName = "";
+            if (userIndustry) {
+                const [industryId, ...subParts] = userIndustry.split("-");
+                const targetSubSlug = subParts.join("-");
+
+                const indObj = industries.find(i => i.id === industryId);
+                subIndustryName = indObj?.subIndustries.find(
+                    s => s.toLowerCase().replace(/ /g, "-") === targetSubSlug
+                ) || "";
+            }
+
+            toast.success("Flight path confirmed! Redirecting...", { id: toastId });
+
+            router.replace(`/onboarding?industry=${encodeURIComponent(subIndustryName)}&skills=${encodeURIComponent(skillsStr)}&bio=${encodeURIComponent(bio)}&selectedRole=${encodeURIComponent(role.role)}`);
+        } catch (error) {
+            console.error(error);
+            toast.error("Navigation failed. Please check your connection.", { id: toastId });
         } finally {
             setLoading(false);
         }

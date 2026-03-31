@@ -1,15 +1,12 @@
 import { z } from "zod";
 
 export const onboardingSchema = z.object({
-  industry: z.string({
-    required_error: "Please select an industry",
-  }),
-  subIndustry: z.string({
-    required_error: "Please select a specialization",
-  }),
+  industry: z.string().min(1, "Please select an industry"),
+  subIndustry: z.string().min(1, "Please select a specialization"),
   bio: z.string().min(10, "Bio must be at least 10 characters long"),
   experience: z
     .string()
+    .min(1, "Years of experience is required")
     .transform((val) => parseInt(val, 10))
     .pipe(
       z
@@ -27,8 +24,8 @@ export const onboardingSchema = z.object({
   ).refine((skills) => skills && skills.length > 0, {
     message: "At least one skill is required",
   }),
-  country: z.string().min(2, "Country is required"),
-  city: z.string().min(2, "City is required"),
+  country: z.string().min(1, "Country is required"),
+  city: z.string().min(1, "City is required"),
 });
 
 export const contactSchema = z.object({
