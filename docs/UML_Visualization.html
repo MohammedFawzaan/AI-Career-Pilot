@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Career Coach - UML Diagrams</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <title>AI Career Pilot - UML Diagrams</title>
+    <!-- Use specific 11.13.0 version to ensure stability -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.13.0/dist/mermaid.min.js"></script>
     <script>
         mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
     </script>
@@ -48,6 +49,7 @@
             text-align: center;
             overflow-x: auto;
             padding: 20px 0;
+            min-height: 200px; /* Ensure space before render */
         }
 
         .instructions {
@@ -87,56 +89,55 @@
 
 <body>
 
-    <h1>AI Career Coach - UML Diagrams</h1>
+    <h1>AI Career Pilot - UML Diagrams</h1>
 
     <div class="instructions">
-        <strong>✨ New Feature:</strong> Download buttons added below each diagram!
+        <strong>✨ Latest Project State:</strong> These diagrams reflect the latest features including multi-layered assessments, roadmap generation, and caching patterns.
         <br>Click "Download PNG" to save high-quality images directly to your computer.
     </div>
 
     <!-- 1. Use Case Diagram -->
     <div class="diagram-card">
         <h2>1. Use Case Diagram</h2>
+        <!-- Formatted as flowchart TD to emulate rigorous Use Case standard without experimental plugin errors -->
         <div class="mermaid" id="diag-1">
             graph TD
-            User((Job Seeker))
-            AI((Google Gemini API))
-            Auth((Clerk Auth))
+                User((User / Job Seeker))
+                AI((Google Gemini API))
+                Auth((Clerk Auth))
+                Jobs((JSearch API))
 
-            subgraph System ["AI Career Coach System"]
-            UC1([Login / Register])
-            UC2([Onboarding])
-            UC3([Dashboard / Industry Insights])
-            UC4([Create AI Resume])
-            UC5([Generate Cover Letter])
-            UC6([Mock Interview Session])
+                subgraph "AI Career Pilot System"
+                UC1([Sign Up / Sign In])
+                UC2([Perform Multi-layered Assessment])
+                UC3([Select Career Path])
+                UC4([View Industry Insights])
+                UC5([Build AI-Optimized Resume])
+                UC6([Generate Tailored Cover Letter])
+                UC7([Practice Mock Interview])
+                UC8([Search Internships Local/Remote])
+                UC9([Generate Career Roadmap])
+                UC10([Provide Assessment Feedback])
+                end
 
-            UC7([View Feedback & Scores])
-            UC8([Download Documents])
-            UC9([Select Resume Context])
-            end
+                User --> UC1
+                User --> UC2
+                User --> UC3
+                User --> UC4
+                User --> UC5
+                User --> UC6
+                User --> UC7
+                User --> UC8
+                User --> UC9
+                User --> UC10
 
-            %% Actor Intractions
-            User --> UC1
-            User --> UC2
-            User --> UC3
-            User --> UC4
-            User --> UC5
-            User --> UC6
-
-            %% Advanced Relationships (Mimicking Sample)
-            UC6 -.->|&lt;&lt;extends&gt;&gt;| UC7
-            UC3 -.->|&lt;&lt;extends&gt;&gt;| UC7
-            UC5 -.->|&lt;&lt;includes&gt;&gt;| UC9
-            UC4 -.->|&lt;&lt;includes&gt;&gt;| UC8
-            UC5 -.->|&lt;&lt;includes&gt;&gt;| UC8
-
-            %% System Dependencies
-            UC1 -.-> Auth
-            UC3 -.-> AI
-            UC4 -.-> AI
-            UC5 -.-> AI
-            UC6 -.-> AI
+                UC1 -.->|verifies| Auth
+                UC2 -.->|analyzes| AI
+                UC5 -.->|optimizes| AI
+                UC6 -.->|generates| AI
+                UC7 -.->|grades| AI
+                UC8 -.->|fetches| Jobs
+                UC9 -.->|generates path| AI
         </div>
         <div class="btn-container">
             <button class="download-btn" onclick="downloadSVG('diag-1', 'UseCase_Diagram.png')">Download PNG</button>
@@ -145,45 +146,50 @@
 
     <!-- 2. Activity Diagram -->
     <div class="diagram-card">
-        <h2>2. Activity Diagram (Comprehensive System Flow)</h2>
+        <h2>2. Activity Diagram (Comprehensive Flow)</h2>
         <div class="mermaid" id="diag-2">
             flowchart TD
-            start([Start]) --> Login[User Logs In]
-            Login --> Auth{Authenticated?}
-            Auth -- No --> SignUp[Sign Up / Login via Clerk]
-            SignUp --> Onboard[Onboarding: Industry & Skills]
-            Onboard --> ProfileSetup[Profile Setup & Review]
-            Auth -- Yes --> Dash[Dashboard: Industry Insights<br />Trending Tech & Skills]
-            ProfileSetup --> Dash
-
-            Dash --> Choice{Select Feature}
-
-            %% Resume Path
-            Choice -- Resume Builder --> ResForm[Enter Details / Upload]
-            ResForm --> ResAI[Request AI Optimization]
-            ResAI --> CheckRes[Review Markdown Resume]
-            CheckRes --> SaveRes[Save Resume]
-
-            %% Cover Letter Path
-            Choice -- Cover Letter --> SelRes[Select Resume]
-            SelRes --> PasteJD[Paste Job Description]
-            PasteJD --> GenCL[Generate Cover Letter]
-            GenCL --> EditCL[Edit & Refine]
-            EditCL --> SaveCL[Save Cover Letter]
-
-            %% Interview Path
-            Choice -- Mock Interview --> ConfigInt[Select Topic & Difficulty]
-            ConfigInt --> StartInt[Start Session]
-            StartInt --> QLoop{Question Loop}
-            QLoop -- Ask --> GenQ[AI Generates Question]
-            GenQ --> UserAns[User Answers]
-            UserAns --> Analy[AI Analyzes & Rates]
-            Analy --> QLoop
-            QLoop -- End --> Summ[View Feedback Summary]
-
-            SaveRes --> Dash
-            SaveCL --> Dash
-            Summ --> Dash
+                start([Start]) --> Login[User Logs In via Clerk]
+                Login --> Auth{Authenticated?}
+                Auth -- No --> Signup[Sign Up]
+                Signup --> Login
+                Auth -- Yes --> CheckOnboard{Is Onboarded?}
+                
+                CheckOnboard -- No --> SelectType[Select User Type: Fresher/Experienced]
+                SelectType --> QualAssess[Multi-layered AI Assessment]
+                QualAssess --> Results[View Recommended Roles]
+                Results --> PathSel[Select Career Path]
+                PathSel --> ProfileSetup[Profile Setup & Skill Sync]
+                ProfileSetup --> Dashboard
+                
+                CheckOnboard -- Yes --> Dashboard[Main Dashboard: Industry Insights]
+                
+                Dashboard --> Features{Select Feature}
+                
+                %% Internship Path
+                Features -- Search Internships --> CacheCheck{Is Data Cached?}
+                CacheCheck -- Yes --> ShowJobs[Show Local & Remote Internships]
+                CacheCheck -- No --> APIFetch[Parallel API Fetch: JSearch]
+                APIFetch --> StoreCache[Store in Next.js Cache - 1hr]
+                StoreCache --> ShowJobs
+                
+                %% Roadmap Path
+                Features -- Career Roadmap --> GapAnalysis[Perform Skill Gap Analysis]
+                GapAnalysis --> GenRoadmap[Generate AI Roadmap: 3/6/12 Months]
+                GenRoadmap --> MarkProgress[Monitor Progress]
+                
+                %% Resume/CL Path
+                Features -- Build Documents --> DocGen[Resume/Cover Letter Generation]
+                DocGen --> AIEdit[AI Optimization]
+                
+                %% Interview Path
+                Features -- Mock Interview --> IntSess[Session: Context-Aware Q&A]
+                IntSess --> AIFeedback[Receive Instant Feedback & Scoring]
+                
+                ShowJobs --> Dashboard
+                MarkProgress --> Dashboard
+                AIEdit --> Dashboard
+                AIFeedback --> Dashboard
         </div>
         <div class="btn-container">
             <button class="download-btn" onclick="downloadSVG('diag-2', 'Activity_Diagram.png')">Download PNG</button>
@@ -192,37 +198,34 @@
 
     <!-- 3. Sequence Diagram -->
     <div class="diagram-card">
-        <h2>3. Sequence Diagram (Content Generation Flow)</h2>
+        <h2>3. Sequence Diagram (Overall Core System Flow)</h2>
         <div class="mermaid" id="diag-3">
             sequenceDiagram
-            participant U as User
-            participant FE as Frontend (Next.js)
-            participant BE as Backend (Server Actions)
-            participant DB as Neon DB (Prisma)
-            participant AI as Google Gemini API
+                participant U as User
+                participant Auth as Clerk Auth
+                participant FE as Next.js Frontend
+                participant BE as Server Actions
+                participant DB as Prisma / Neon DB
+                participant AI as Google Gemini API
 
-            note over U, FE: User initiates generation
+                U->>FE: Access Platform / Start Feature
+                FE->>Auth: Request Authentication Scope
+                Auth-->>FE: Return Secure Token (JWT)
 
-            U->>FE: Click "Industry Insights/Skill Recommendation"
-            U->>FE: Click "Generate Resume/Cover Letter"
-            U->>FE: Click "Mock Interview Prep"
-            FE->>BE: POST request (User Data + Prompt)
-            BE->>DB: Fetch User Context / Profile
-            DB-->>BE: Return Profile Data
+                U->>FE: Submit Assesment/Generation Data
+                FE->>BE: POST Encrypted Data Payload
+                BE->>DB: Query User Profile Context
+                DB-->>BE: Return Historical Context Data
 
-            BE->>AI: Send Prompt (Profile + Requirements)
-            activate AI
-            AI-->>BE: Return Generated Content
-            deactivate AI
+                BE->>AI: Send Engineered Prompt
+                activate AI
+                AI-->>BE: Return Generated JSON/Markdown
+                deactivate AI
 
-            BE->>FE: Return Markdown Response
-            FE->>U: Display Preview
-
-            U->>FE: Click "Save to Dashboard"
-            FE->>BE: Save Action
-            BE->>DB: Insert into DB
-            DB-->>BE: Confirmation
-            BE-->>FE: Success Toast
+                BE->>DB: Save Generated Artifacts/Scores
+                DB-->>BE: Confirm Successful Write
+                BE-->>FE: Return Payload & Success State
+                FE-->>U: Render AI Content on Dashboard
         </div>
         <div class="btn-container">
             <button class="download-btn" onclick="downloadSVG('diag-3', 'Sequence_Diagram.png')">Download PNG</button>
@@ -231,137 +234,112 @@
 
     <!-- 4. Class Diagram -->
     <div class="diagram-card">
-        <h2>4. Class Diagram (Expanded)</h2>
+        <h2>4. Class Diagram (Database Schema)</h2>
         <div class="mermaid" id="diag-4">
             classDiagram
-            class User {
-            +String id
-            +String clerkId
-            +String industry
-            +Int experienceYears
-            +List~Resume~ resumes
-            +List~CoverLetter~ coverLetters
-            +List~MockInterview~ interviews
-            }
+                class User {
+                    +String id
+                    +String clerkUserId
+                    +UserType userType
+                    +String industry
+                    +String country
+                    +String city
+                    +String[] skills
+                    +Int experience
+                }
+                
+                class CareerAssessment {
+                    +String id
+                    +Json questions
+                    +String primaryRole
+                    +Json analysis
+                }
+                
+                class CareerRoadmap {
+                    +String id
+                    +Int duration
+                    +Json roadmapData
+                    +Json progress
+                }
+                
+                class InterviewQuiz {
+                    +String id
+                    +Float quizScore
+                    +String category
+                    +Json[] questions
+                }
+                
+                class Resume {
+                    +String id
+                    +String contentMarkdown
+                    +Float atsScore
+                }
+                
+                class AssessmentFeedback {
+                    +String id
+                    +Int rating
+                    +Boolean isAccurate
+                    +String comment
+                }
 
-            class Resume {
-            +String id
-            +String title
-            +String contentMarkdown
-            +String atsScore
-            }
-
-            class CoverLetter {
-            +String id
-            +String jobDescription
-            +String generatedText
-            }
-
-            class MockInterview {
-            +String id
-            +String industry
-            +Int overallScore
-            +List~InterviewQuestion~ questions
-            }
-
-            class InterviewQuestion {
-            +String question
-            +String userAnswer
-            +String feedback
-            +Int score
-            }
-
-            class IndustryInsight {
-            +String id
-            +String industry
-            +List~String~ trendingSkills
-            +List~String~ salaryRange
-            }
-
-            class Database_Neon {
-            +saveUser()
-            +saveResume()
-            +saveInterview()
-            }
-
-            class Gemini_API {
-            +generateResume()
-            +generateCoverLetter()
-            +generateQuestion()
-            +analyzeAnswer()
-            }
-
-            User "1" --> "*" Resume
-            User "1" --> "*" CoverLetter
-            User "1" --> "*" MockInterview
-            MockInterview "1" --> "*" InterviewQuestion
-            User ..> IndustryInsight : views
-            User ..> Gemini_API : uses via Backend
-            User ..> Database_Neon : stores data
+                class IndustryInsight {
+                    +String industry
+                    +Json[] salaryRanges
+                    +String demandLevel
+                    +String[] topSkills
+                }
+                
+                User "1" -- "0..1" CareerAssessment : has
+                User "1" -- "0..1" CareerRoadmap : focuses on
+                User "1" -- "0..1" Resume : builds
+                User "1" -- "*" InterviewQuiz : practices
+                CareerAssessment "1" -- "0..1" AssessmentFeedback : receives
+                User "*" -- "1" IndustryInsight : follows
         </div>
         <div class="btn-container">
             <button class="download-btn" onclick="downloadSVG('diag-4', 'Class_Diagram.png')">Download PNG</button>
         </div>
     </div>
 
-    <!-- 5. Flowchart Diagram -->
+    <!-- 5. Deployment Diagram -->
     <div class="diagram-card">
-        <h2>5. Flowchart Diagram (System Navigation)</h2>
+        <h2>5. Deployment Diagram</h2>
         <div class="mermaid" id="diag-5">
-            graph TD
-            A[Landing Page] -->|Click Get Started| B{Is Authenticated?}
-            B -- No --> C[Clerk Login/Signup]
-            C --> B
-            B -- Yes --> D{Is Onboarded?}
-            D -- No --> E[Onboarding Form]
-            E --> F[Profile Setup]
-            F --> F2[Save to DB]
-            F2 --> G[Dashboard: Industry Insights]
-            D -- Yes --> G
-
-            G --> H[Resume Builder]
-            G --> I[Cover Letter Gen]
-            G --> J[Mock Interview]
-
-            H --> K[View/Edit Resume]
-            I --> L[View/Edit Letter]
-            J --> M[Interview Session]
-            M --> N[Results & Feedback]
-            N --> G
-        </div>
-        <div class="btn-container">
-            <button class="download-btn" onclick="downloadSVG('diag-5', 'Flowchart_Diagram.png')">Download PNG</button>
-        </div>
-    </div>
-
-    <!-- 6. Deployment Diagram -->
-    <div class="diagram-card">
-        <h2>6. Deployment Diagram</h2>
-        <div class="mermaid" id="diag-6">
             graph TB
-            subgraph Client ["Client Side"]
-            Browser[User Browser]
-            end
+                subgraph Client ["Client Interface"]
+                    Web[Web Browser / Mobile]
+                    AuthC[Clerk Client SDK]
+                end
+                
+                subgraph Vercel ["Cloud Platform (Vercel)"]
+                    NextJS[Next.js 15 App]
+                    Actions[Server Actions]
+                    Jobs[Inngest Background Jobs]
+                end
+                
+                subgraph Data ["Data & AI Persistence"]
+                    Neon[(Neon PostgreSQL)]
+                    Prisma[Prisma ORM]
+                end
+                
+                subgraph External ["External Intelligence APIs"]
+                    Gemini[Google Gemini 2.0 Flash]
+                    Rapid[RapidAPI JSearch]
+                    Clerk[Clerk Auth Service]
+                end
 
-            subgraph Server ["Server Side (Vercel)"]
-            NextJS[Next.js App Router]
-            API[API Routes]
-            end
-
-            subgraph External ["Cloud Infrastructure"]
-            Neon[(Neon DB Postgres)]
-            Gemini[Google Gemini API]
-            Clerk[Clerk Auth]
-            end
-
-            Browser -->|HTTPS| NextJS
-            NextJS -->|Internal Call| API
-            API -->|TCP/Prisma| Neon
-            API -->|REST/JSON| Gemini
-            Browser -->|JWT| Clerk
+                Web -->|HTTPS/Actions| NextJS
+                NextJS --> Actions
+                Actions --> Prisma
+                Prisma --> Neon
+                Actions --> Gemini
+                Actions --> Rapid
+                NextJS --> Jobs
+                Web --> AuthC
+                AuthC <--> Clerk
         </div>
         <div class="btn-container">
-            <button class="download-btn" onclick="downloadSVG('diag-6', 'Deployment_Diagram.png')">Download PNG</button>
+            <button class="download-btn" onclick="downloadSVG('diag-5', 'Deployment_Diagram.png')">Download PNG</button>
         </div>
     </div>
 
@@ -371,7 +349,7 @@
             const svg = container.querySelector('svg');
 
             if (!svg) {
-                alert("Diagram not ready yet or syntax error. Please wait.");
+                alert("Diagram not ready yet or syntax error in Mermaid code. Please wait a moment.");
                 return;
             }
 
@@ -392,15 +370,13 @@
             const serializer = new XMLSerializer();
             let source = serializer.serializeToString(svg);
 
-            // Add namespaces if missing
+            // Corrected Javascript syntax below: Add namespaces if missing
             if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
                 source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
             }
             if (!source.match(/^<svg[^>]+xmlns:xlink="http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
                 source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
             }
-
-            // Add width/height to source explicitly if missing to ensure image loads correctly
             if (!source.match(/^<svg[^>]+width="/)) {
                 source = source.replace(/^<svg/, `<svg width="${width}" height="${height}"`);
             }
@@ -433,7 +409,7 @@
             };
 
             img.onerror = function () {
-                alert("Error generating image. Please try using a different browser.");
+                alert("Error generating image. Please try using a different browser/zoom level.");
             };
         }
     </script>

@@ -1,234 +1,224 @@
-# UML Diagrams for AI Career Coach
+# UML Diagrams for AI Career Pilot
 
-> **Note**: For the best viewing experience, please open `UML_Visualization.html` in your browser.
+> **Note**: These diagrams represent the latest architectural features of the AI Career Pilot platform, including multi-layered assessments, location-based internship search, and AI-driven career roadmaps.
 
 ## 1. Use Case Diagram
-Describes the functional requirements and user interactions with the system.
+Describes the functional requirements and user interactions with the system, highlighting the AI-powered features.
 
 ```mermaid
 usecaseDiagram
-    actor "Job Seeker" as User
+    actor "User (Job Seeker)" as User
     actor "Google Gemini API" as AI
     actor "Clerk Auth" as Auth
+    actor "JSearch API" as Jobs
 
     usecase "Sign Up / Sign In" as UC1
-    usecase "Onboarding (Industry/Experience)" as UC2
-    usecase "Dashboard: Industry Insights" as UC6
-    usecase "Create AI Resume" as UC3
-    usecase "Generate Cover Letter" as UC4
-    usecase "Start Mock Interview" as UC5
-    usecase "Download Documents" as UC7
+    usecase "Perform Multi-layered Assessment" as UC2
+    usecase "Select Career Path" as UC3
+    usecase "View Industry Insights" as UC4
+    usecase "Build AI-Optimized Resume" as UC5
+    usecase "Generate Tailored Cover Letter" as UC6
+    usecase "Practice Mock Interview" as UC7
+    usecase "Search Internships (Local/Remote)" as UC8
+    usecase "Generate Career Roadmap" as UC9
+    usecase "Provide Assessment Feedback" as UC10
 
     User --> UC1
     User --> UC2
-    User --> UC6
     User --> UC3
     User --> UC4
     User --> UC5
+    User --> UC6
     User --> UC7
+    User --> UC8
+    User --> UC9
+    User --> UC10
 
-    UC1 ..> Auth : uses
-    UC3 ..> AI : generates content
-    UC4 ..> AI : generates content
-    UC5 ..> AI : generates Q&A
+    UC1 ..> Auth : verifies
+    UC2 ..> AI : analyzes responses
+    UC5 ..> AI : optimizes content
+    UC6 ..> AI : generates text
+    UC7 ..> AI : provides feedback
+    UC8 ..> Jobs : fetches data
+    UC9 ..> AI : generates learning path
 ```
 
 ## 2. Activity Diagram
-Comprehensive system flow including Resume Builder, Cover Letter, and Interviews.
+Comprehensive system flow showing the progression from onboarding to career-ready artifacts.
 
 ```mermaid
 flowchart TD
-    start([Start]) --> Login[User Logs In]
+    start([Start]) --> Login[User Logs In via Clerk]
     Login --> Auth{Authenticated?}
-    Auth -- No --> SignUp[Sign Up / Login via Clerk]
-    SignUp --> Onboard[Onboarding: Industry & Skills]
-    Onboard --> ProfileSetup[Profile Setup & Review]
-    Auth -- Yes --> Dash[Dashboard: Industry Insights<br/>Trending Tech & Skills]
-    ProfileSetup --> Dash
+    Auth -- No --> Signup[Sign Up]
+    Signup --> Login
+    Auth -- Yes --> CheckOnboard{Is Onboarded?}
     
-    Dash --> Choice{Select Feature}
+    CheckOnboard -- No --> SelectType[Select User Type: Fresher/Experienced]
+    SelectType --> QualAssess[Multi-layered AI Assessment]
+    QualAssess --> Results[View Recommended Roles]
+    Results --> PathSel[Select Career Path]
+    PathSel --> ProfileSetup[Profile Setup & Skill Sync]
+    ProfileSetup --> Dashboard
     
-    %% Resume Path
-    Choice -- Resume Builder --> ResForm[Enter Details / Upload]
-    ResForm --> ResAI[Request AI Optimization]
-    ResAI --> CheckRes[Review Markdown Resume]
-    CheckRes --> SaveRes[Save Resume]
+    CheckOnboard -- Yes --> Dashboard[Main Dashboard: Industry Insights]
     
-    %% Cover Letter Path
-    Choice -- Cover Letter --> SelRes[Select Resume]
-    SelRes --> PasteJD[Paste Job Description]
-    PasteJD --> GenCL[Generate Cover Letter]
-    GenCL --> EditCL[Edit & Refine]
-    EditCL --> SaveCL[Save Cover Letter]
+    Dashboard --> Features{Select Feature}
+    
+    %% Internship Path
+    Features -- Search Internships --> CacheCheck{Is Data Cached?}
+    CacheCheck -- Yes --> ShowJobs[Show Local & Remote Internships]
+    CacheCheck -- No --> APIFetch[Parallel API Fetch: JSearch]
+    APIFetch --> StoreCache[Store in Next.js Cache - 1hr]
+    StoreCache --> ShowJobs
+    
+    %% Roadmap Path
+    Features -- Career Roadmap --> GapAnalysis[Perform Skill Gap Analysis]
+    GapAnalysis --> GenRoadmap[Generate AI Roadmap: 3/6/12 Months]
+     GenRoadmap --> MarkProgress[Monitor Progress]
+    
+    %% Resume/CL Path
+    Features -- Build Documents --> DocGen[Resume/Cover Letter Generation]
+    DocGen --> AIEdit[AI Optimization]
     
     %% Interview Path
-    Choice -- Mock Interview --> ConfigInt[Select Topic & Difficulty]
-    ConfigInt --> StartInt[Start Session]
-    StartInt --> QLoop{Question Loop}
-    QLoop -- Ask --> GenQ[AI Generates Question]
-    GenQ --> UserAns[User Answers]
-    UserAns --> Analy[AI Analyzes & Rates]
-    Analy --> QLoop
-    QLoop -- End --> Summ[View Feedback Summary]
+    Features -- Mock Interview --> IntSess[Session: Context-Aware Q&A]
+    IntSess --> AIFeedback[Receive Instant Feedback & Scoring]
     
-    SaveRes --> Dash
-    SaveCL --> Dash
-    Summ --> Dash
+    ShowJobs --> Dashboard
+    MarkProgress --> Dashboard
+    AIEdit --> Dashboard
+    AIFeedback --> Dashboard
 ```
 
-## 3. Sequence Diagram
-Showing the interaction sequence for generating content (Resume/Letter).
+## 3. Sequence Diagram: Internship Search with Caching
+Showing how the system optimizes API calls using the caching strategy described in the project documentation.
 
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant FE as Frontend (Next.js)
-    participant BE as Backend (Server Actions)
-    participant DB as Neon DB (Prisma)
-    participant AI as Google Gemini API
+    participant FE as Frontend (Internships Page)
+    participant BE as Server Actions (getInternships)
+    participant CA as Cache (unstable_cache)
+    participant RA as RapidAPI (JSearch)
 
-    note over U, FE: User initiates generation
-
-    U->>FE: Click "Generate Cover Letter/Resume"
-    FE->>BE: POST request (User Data + Prompt)
-    BE->>DB: Fetch User Context / Profile
-    DB-->>BE: Return Profile Data
+    U->>FE: Navigate to /internships
+    FE->>BE: Invoke fetch action (role, location)
+    BE->>CA: Check for valid cache entry
     
-    BE->>AI: Send Prompt (Profile + Requirements)
-    activate AI
-    AI-->>BE: Return Generated Content
-    deactivate AI
+    alt Cache Hit
+        CA-->>BE: Return cached JSON results
+    else Cache Miss
+        BE->>RA: GET /search (Local Internships)
+        BE->>RA: GET /search (Remote Internships)
+        Note right of RA: Parallel Processing
+        RA-->>BE: Return Job Objects
+        BE->>CA: Store results (TTL: 3600s)
+    end
     
-    BE->>FE: Return Markdown Response
-    FE->>U: Display Preview
-    
-    U->>FE: Click "Save to Dashboard"
-    FE->>BE: Save Action
-    BE->>DB: Insert into DB
-    DB-->>BE: Confirmation
-    BE-->>FE: Success Toast
+    BE-->>FE: Return filtered internship list
+    FE->>U: Render Local & Remote sections
 ```
 
-## 4. Class Diagram
-Represents the database schema and object relationships, including external services.
+## 4. Class Diagram (Database Schema)
+Represents the Prisma models and their inter-relationships within the Neon PostgreSQL database.
 
 ```mermaid
 classDiagram
     class User {
         +String id
-        +String clerkId
+        +String clerkUserId
+        +UserType userType
         +String industry
-        +Int experienceYears
-        +List~Resume~ resumes
-        +List~CoverLetter~ coverLetters
-        +List~MockInterview~ interviews
+        +String country
+        +String city
+        +String[] skills
+        +Int experience
+    }
+    
+    class CareerAssessment {
+        +String id
+        +Json questions
+        +String primaryRole
+        +Json analysis
+    }
+    
+    class CareerRoadmap {
+        +String id
+        +Int duration
+        +Json roadmapData
+        +Json progress
+    }
+    
+    class InterviewQuiz {
+        +String id
+        +Float quizScore
+        +String category
+        +Json[] questions
     }
     
     class Resume {
         +String id
-        +String title
         +String contentMarkdown
-        +String atsScore
+        +Float atsScore
     }
     
-    class CoverLetter {
+    class AssessmentFeedback {
         +String id
-        +String jobDescription
-        +String generatedText
+        +Int rating
+        +Boolean isAccurate
+        +String comment
     }
-    
-    class MockInterview {
-        +String id
-        +String industry
-        +Int overallScore
-        +List~InterviewQuestion~ questions
-    }
-    
-    class InterviewQuestion {
-        +String question
-        +String userAnswer
-        +String feedback
-        +Int score
-    }
-    
+
     class IndustryInsight {
-        +String id
         +String industry
-        +List~String~ trendingSkills
-        +List~String~ salaryRange
+        +Json[] salaryRanges
+        +String demandLevel
+        +String[] topSkills
     }
     
-    class Database_Neon {
-        +saveUser()
-        +saveResume()
-        +saveInterview()
-    }
-    
-    class Gemini_API {
-        +generateResume()
-        +generateCoverLetter()
-        +generateQuestion()
-        +analyzeAnswer()
-    }
-    
-    User "1" --> "*" Resume
-    User "1" --> "*" CoverLetter
-    User "1" --> "*" MockInterview
-    MockInterview "1" --> "*" InterviewQuestion
-    User ..> IndustryInsight : views
-    User ..> Gemini_API : uses via Backend
-    User ..> Database_Neon : stores data
+    User "1" -- "0..1" CareerAssessment : has
+    User "1" -- "0..1" CareerRoadmap : focuses on
+    User "1" -- "0..1" Resume : builds
+    User "1" -- "*" InterviewQuiz : practices
+    CareerAssessment "1" -- "0..1" AssessmentFeedback : receives
+    User "*" -- "1" IndustryInsight : follows
 ```
 
-## 5. Flowchart Diagram (System Flow)
-High-level navigation flow of the application.
-
-```mermaid
-graph TD
-    A[Landing Page] -->|Click Get Started| B{Is Authenticated?}
-    B -- No --> C[Clerk Login/Signup]
-    C --> B
-    B -- Yes --> D{Is Onboarded?}
-    D -- No --> E[Onboarding Form]
-    E --> F[Profile Setup]
-    F --> F2[Save to DB]
-    F2 --> G[Dashboard: Industry Insights]
-    D -- Yes --> G
-    
-    G --> H[Resume Builder]
-    G --> I[Cover Letter Gen]
-    G --> J[Mock Interview]
-    
-    H --> K[View/Edit Resume]
-    I --> L[View/Edit Letter]
-    J --> M[Interview Session]
-    M --> N[Results & Feedback]
-    N --> G
-```
-
-## 6. Deployment Diagram
-Shows the physical/architectural deployment of the system.
+## 5. Deployment Diagram
+Visualizing the modern serverless infrastructure used by AI Career Pilot.
 
 ```mermaid
 graph TB
-    subgraph Client ["Client Side"]
-        Browser[User Browser]
+    subgraph Client ["Client Interface"]
+        Web[web Browser / Mobile]
+        AuthC[Clerk Client SDK]
     end
     
-    subgraph Server ["Server Side (Vercel)"]
-        NextJS[Next.js App Router]
-        API[API Routes]
+    subgraph Vercel ["Cloud Platform (Vercel)"]
+        NextJS[Next.js 15 App]
+        Actions[Server Actions]
+        Jobs[Inngest Background Jobs]
     end
     
-    subgraph External ["External Services"]
-        Neon[(Neon DB Postgres)]
-        Gemini[Google Gemini API]
-        Clerk[Clerk Auth]
+    subgraph Data ["Data & AI Persistence"]
+        Neon[(Neon PostgreSQL)]
+        Prisma[Prisma ORM]
+    end
+    
+    subgraph External ["External Intelligence APIs"]
+        Gemini[Google Gemini 2.0 Flash]
+        Rapid[RapidAPI JSearch]
+        Clerk[Clerk Auth Service]
     end
 
-    Browser -->|HTTPS| NextJS
-    NextJS -->|Internal Call| API
-    API -->|TCP/Prisma| Neon
-    API -->|REST/JSON| Gemini
-    Browser -->|JWT| Clerk
+    Web -->|HTTPS/Actions| NextJS
+    NextJS --> Actions
+    Actions --> Prisma
+    Prisma --> Neon
+    Actions --> Gemini
+    Actions --> Rapid
+    NextJS --> Jobs
+    Web --> AuthC
+    AuthC <--> Clerk
 ```
