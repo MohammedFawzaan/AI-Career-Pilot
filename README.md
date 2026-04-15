@@ -6,8 +6,9 @@
 
 Whether you are a student, a career switcher, or a professional looking to level up, this tool provides the personalized guidance you need to land your dream job.
 
-## 🌐 Live Demo
-Experience the platform live: [**AI Career Pilot on Vercel**](https://ai-career-pilot-ecru.vercel.app)
+## 🌐 Live
+Experience the platform live: [**careerpilot.fawzaan.in**](https://careerpilot.fawzaan.in)
+*(Mirror: [Vercel Deployment](https://ai-career-pilot-ecru.vercel.app))*
 
 ## ✨ Key Features
 
