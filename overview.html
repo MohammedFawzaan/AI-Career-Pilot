@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Career Pilot - Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --primary-blue: #0f2c4a;
+    --accent-cyan: #22d3ee;
+    --bg-page: #e2e8f0;
+    --card-bg: #ffffff;
+    --border-color: #cbd5e1;
+    --accent-red: #ef4444;
+    --bg-warning: #fef2f2;
+    --table-header: #0f172a;
+    --table-row-alt: #f8fafc;
+    --table-highlight: #ecfccb;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-page);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+  }
+  .page {
+    max-width: 850px;
+    margin: 40px auto;
+    background: var(--card-bg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 60px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    page-break-after: always;
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-blue);
+    margin: 0 0 10px 0;
+  }
+  
+  /* Title Page */
+  .title-page {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    text-align: center;
+    padding: 100px 40px;
+    border-radius: 12px;
+  }
+  .title-page h1 {
+    color: white;
+    font-size: 3rem;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+  .title-page h1 span {
+    color: var(--accent-cyan);
+  }
+  .title-page p.desc {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 40px auto;
+  }
+  .title-footer {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    text-align: left;
+  }
+  .title-footer > div span {
+    display: block;
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* Section Styles */
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-top: 50px;
+    margin-bottom: 20px;
+  }
+  .sec-num {
+    background: var(--primary-blue);
+    color: white;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .sec-title h2 {
+    font-size: 2rem;
+    margin: 0;
+  }
+  .sec-title p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  /* Warning / Info Boxes */
+  .warning-box {
+    background: var(--bg-warning);
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+  .warning-box h4 {
+    color: var(--accent-red);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .warning-box ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.9rem;
+  }
+  .warning-box li {
+    margin-bottom: 8px;
+  }
+  .warning-box li strong {
+    color: var(--text-primary);
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.85rem;
+  }
+  th {
+    background: var(--table-header);
+    color: white;
+    text-align: left;
+    padding: 12px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  tr:nth-child(even) {
+    background: var(--table-row-alt);
+  }
+  tr.highlight {
+    background: var(--table-highlight);
+    font-weight: 500;
+  }
+  
+  /* Novel Contribution Box */
+  .novel-box {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 30px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .novel-badge {
+    color: var(--accent-cyan);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    border: 1px solid var(--accent-cyan);
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .novel-box h3 {
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+  }
+  .novel-box p {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+
+  /* Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 20px 0 30px 0;
+  }
+  .small-card {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    border-top: 3px solid;
+  }
+  .small-card h5 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+  .small-card p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Approach Line */
+  .approach-list {
+    list-style: none;
+    padding-left: 20px;
+    border-left: 3px solid var(--border-color);
+    margin: 20px 0;
+  }
+  .approach-list li {
+    position: relative;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+  }
+  .approach-list li::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 6px;
+    width: 7px;
+    height: 7px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+  }
+
+  /* Architecture Layers */
+  .architecture-layers {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+  .layer {
+    margin-bottom: 20px;
+  }
+  .layer:last-child { margin-bottom: 0; }
+  .layer-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .layer-items {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .arch-chip {
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .connector {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin: 10px 0;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+  }
+  .stat-box {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+  }
+  .stat-val {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 5px;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  /* Check List */
+  .check-list {
+    list-style: none;
+    padding: 0;
+  }
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+  }
+  .check-list li svg {
+    color: #0d9488;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    position: relative;
+    top: 2px;
+  }
+
+  /* Bottom Dark Box */
+  .key-achievement {
+    background: var(--primary-blue);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-top: 30px;
+  }
+  .key-achievement-title {
+    color: var(--accent-cyan);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  /* Applications Grid */
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .app-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+  }
+  .app-card h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: var(--text-primary);
+  }
+  .app-card p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 5px 0 0 0;
+  }
+
+  /* Target Customers */
+  .customer-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  .customer-badge {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Future Scope */
+  .future-list {
+    counter-reset: future-counter;
+    list-style: none;
+    padding: 0;
+  }
+  .future-list li {
+    position: relative;
+    padding-left: 45px;
+    margin-bottom: 20px;
+  }
+  .future-list li::before {
+    counter-increment: future-counter;
+    content: counter(future-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .future-list h5 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+  .future-list p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  
+  .highlight-banner {
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 30px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div class="page">
+  <div class="title-page">
+    <div style="margin-bottom: 30px; display: flex; justify-content: center; gap: 15px;">
+      <span style="font-size: 24px;">🚀</span>
+      <span style="font-size: 24px;">🎯</span>
+      <span style="font-size: 24px;">🧠</span>
+      <span style="font-size: 24px;">💼</span>
+    </div>
+    <h1>AI Career Pilot:<br><span>Intelligent Discovery</span><br>& Roadmap System</h1>
+    <p class="desc">
+      An integrated platform combining Gen AI-driven multi-layered psychological/cognitive assessments, dynamic role targeting algorithms, comprehensive career roadmaps, and precision internship/job matching for data-driven professional navigation.
+    </p>
+    <div class="title-footer">
+      <div>
+        <span>CATEGORY</span>
+        Career Tech & EdTech
+      </div>
+      <div style="text-align: center;">
+        <span>TECHNOLOGY</span>
+        Next.js • Gemini LLM • React
+      </div>
+      <div style="text-align: right;">
+        <span>TYPE</span>
+        Intelligent Web Platform
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page">
+  <div class="section-header">
+    <div class="sec-num">1</div>
+    <div class="sec-title">
+      <h2>Problem Statement</h2>
+      <p>Challenges in career planning and role alignment</p>
+    </div>
+  </div>
+  
+  <p>Navigating career paths is often confusing and inefficient for students, career switchers, and professionals alike. Relying on generic advice leads to mismatched career choices, wasted potential, and lack of clear actionable steps. Existing systems do not provide deep personality and cognitive profiling aligned with real-time job market skills.</p>
+
+  <div class="warning-box">
+    <h4>⚠️ CRITICAL CHALLENGES</h4>
+    <ul>
+      <li><strong>Mismatched Careers:</strong> Choosing professional paths without understanding innate cognitive strengths and psychological traits.</li>
+      <li><strong>Generic Guidance:</strong> Lack of personalized, step-by-step actionable roadmaps leading to dead-end efforts.</li>
+      <li><strong>Skill Awareness Gaps:</strong> Inability to map currently held skills to the specific requirements of target industry roles.</li>
+      <li><strong>Inefficient Job Search:</strong> Extreme difficulty in finding internships and jobs that exactly match a user's specific skill stack and competency level.</li>
+    </ul>
+  </div>
+
+  <div class="section-header">
+    <div class="sec-num">2</div>
+    <div class="sec-title">
+      <h2>Assessment Methodology</h2>
+      <p>Analysis of existing models vs. our architecture</p>
+    </div>
+  </div>
+  
+  <p>Extensive study was conducted across career counseling platforms, personality tests, and AI guidance tools. A deep analysis revealed that most methods rely on static questionnaires that fail to adapt dynamically, leaving users with generalized, non-actionable results.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Methodology</th>
+        <th>Input</th>
+        <th>Model</th>
+        <th>Key Output</th>
+        <th>Limitations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Traditional Counseling</td>
+        <td>Manual Int.</td>
+        <td>Human Expert</td>
+        <td>Subjective Advice</td>
+        <td>High cost; limited by personal biases; extremely slow scaling.</td>
+      </tr>
+      <tr>
+        <td>Static Online Quizzes</td>
+        <td>Fixed Q&A</td>
+        <td>Rule-Based</td>
+        <td>Gen. Personality</td>
+        <td>Easily manipulated; shallow insights; ignores modern evolving roles.</td>
+      </tr>
+      <tr>
+        <td>Basic Keyword Matching</td>
+        <td>Skills List</td>
+        <td>Simple DB Query</td>
+        <td>Job Listings</td>
+        <td>Fails to understand context, growth trajectory, or cognitive fit.</td>
+      </tr>
+      <tr class="highlight">
+        <td>★ Proposed Work</td>
+        <td>Multi-layer Data</td>
+        <td>Gemini LLM</td>
+        <td>Dynamic Roadmaps</td>
+        <td>Highly personalized; assesses psychology, targeting, and skills; real-time mapping.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page">
+  <div class="section-header">
+    <div class="sec-num">3</div>
+    <div class="sec-title">
+      <h2>Custom Career Discovery Engine</h2>
+      <p>A purpose-built Multi-Layered Assessment for precision targeting</p>
+    </div>
+  </div>
+
+  <div class="novel-box">
+    <div class="novel-badge">✦ NOVEL CONTRIBUTION</div>
+    <h3>We Researched & Built Our Own Assessment Engine</h3>
+    <p>Unlike existing approaches limited to static 10-question quizzes, our system implements a dynamic, multi-stage assessment (Questionnaires → Role Targeting → Psychological Intelligence) powered by Gen AI to map users to roles with unprecedented accuracy.</p>
+  </div>
+
+  <h4>Why Existing Models Fall Short</h4>
+  <div class="cards-grid">
+    <div class="small-card" style="border-top-color: #ef4444;">
+      <h5>Static Tests</h5>
+      <p>Rigid questions lead to generalized, predictable results suitable for too broad an audience.</p>
+    </div>
+    <div class="small-card" style="border-top-color: #f97316;">
+      <h5>Siloed Job Boards</h5>
+      <p>Offer jobs but lack the bridge (roadmap) explaining how a user can acquire the skills to get there.</p>
+    </div>
+    <div class="small-card" style="border-top-color: #3b82f6;">
+      <h5>Manual Mentorship</h5>
+      <p>Cost-prohibitive and inaccessible for the vast majority of early-stage students.</p>
+    </div>
+  </div>
+
+  <h4>Our Approach</h4>
+  <ul class="approach-list">
+    <li><strong>Multi-Layered Assessment:</strong> Combines tailored dynamic questionnaires, specialized role targeting scenarios, and deep psychological intelligence tasks.</li>
+    <li><strong>Gen AI Integration:</strong> Utilizes advanced LLMs to parse complex user responses into structured cognitive traits and industry affinities.</li>
+    <li><strong>Career Result Generation:</strong> Mathematically aligns user traits to highlight Top Recommended Roles, Target Roles, and Ideal Paths.</li>
+    <li><strong>Roadmap Synthesis:</strong> Auto-generates step-by-step actionable plans detailing exact skills to learn, projects to build, and timelines.</li>
+  </ul>
+  
+  <h4>Platform Impact</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Traditional Portals</th>
+        <th>AI Career Pilot (Our System)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Assessment Depth</td>
+        <td>Single layer (Fixed logic)</td>
+        <td style="color: #059669; font-weight: 600;">Multi-layered (Cognitive + Technical)</td>
+      </tr>
+      <tr>
+        <td>Result Accuracy</td>
+        <td>Broad industry guesses</td>
+        <td style="color: #059669; font-weight: 600;">Highly specific niche roles</td>
+      </tr>
+      <tr>
+        <td>Actionability</td>
+        <td>No clear next steps</td>
+        <td style="color: #059669; font-weight: 600;">Auto-generated Step-by-Step Roadmaps</td>
+      </tr>
+      <tr>
+        <td>Job Alignment</td>
+        <td>Manual keyword search</td>
+        <td style="color: #059669; font-weight: 600;">Skill-verified Internship/Job Finder</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page">
+  <div class="section-header">
+    <div class="sec-num">4</div>
+    <div class="sec-title">
+      <h2>System Architecture</h2>
+      <p>Modular design for scalable career intelligence</p>
+    </div>
+  </div>
+
+  <div class="architecture-layers">
+    <div class="layer">
+      <div class="layer-title">User Interaction Layer</div>
+      <div class="layer-items">
+        <div class="arch-chip">🌐 Next.js Frontend</div>
+        <div class="arch-chip">📱 Responsive UI</div>
+        <div class="arch-chip">✍️ Dynamic Forms</div>
+      </div>
+    </div>
+    <div class="connector">↓ API Routes / Server Actions ↓</div>
+    <div class="layer">
+      <div class="layer-title">Processing & Logic Layer</div>
+      <div class="layer-items">
+        <div class="arch-chip" style="background:#fef3c7; border-color:#fde68a;">⚙️ AI Assessment Engine</div>
+        <div class="arch-chip" style="background:#fef3c7; border-color:#fde68a;">🗺️ Roadmap Synthesizer</div>
+      </div>
+    </div>
+    <div class="connector">↓ Prompt Engineering ↓</div>
+    <div class="layer">
+      <div class="layer-title">Intelligence Layer (AI)</div>
+      <div class="layer-items">
+        <div class="arch-chip" style="background:#e0f2fe; border-color:#bae6fd;">🧠 Google Gemini LLM</div>
+        <div class="arch-chip" style="background:#e0f2fe; border-color:#bae6fd;">📊 Skill Matching Algorithm</div>
+      </div>
+    </div>
+    <div class="connector">↓ Database / Fetching ↓</div>
+    <div class="layer">
+      <div class="layer-title">Data Integration Layer</div>
+      <div class="layer-items">
+        <div class="arch-chip">🗄️ PostgreSQL (Neon)</div>
+        <div class="arch-chip">🔍 Real-time Job APIs</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="sec-num">5</div>
+    <div class="sec-title">
+      <h2>Results & Achievements</h2>
+      <p>Validated performance across all modules</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-val">3</div>
+      <div class="stat-label">Assessment Layers</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">∞</div>
+      <div class="stat-label">Gen AI Paths</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">24/7</div>
+      <div class="stat-label">Roadmap Gen</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">Live</div>
+      <div class="stat-label">Job Finder</div>
+    </div>
+  </div>
+
+  <ul class="check-list">
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> <strong>Custom Discovery Engine:</strong> Dynamic behavioral profiling yields profoundly accurate career trajectories not found in traditional tests.</li>
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> <strong>Roadmap Generation:</strong> Replaces ambiguity with clarity, mapping out exact milestones, courses, and projects required to succeed.</li>
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> <strong>Targeted Job Finder:</strong> Context-aware search pulls live internships and jobs matched specifically to the user's analyzed skill set.</li>
+  </ul>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page">
+  <h3>System Comparison</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Traditional Career Sites</th>
+        <th>Standard Testing</th>
+        <th>AI Career Pilot</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Career Discovery</td>
+        <td><span style="color: #ef4444;">✗ No</span></td>
+        <td><span style="color: #f97316;">• Basic</span></td>
+        <td><span style="color: #059669;">✓ Multi-Layered AI</span></td>
+      </tr>
+      <tr>
+        <td>Actionable Roadmaps</td>
+        <td><span style="color: #ef4444;">✗ No</span></td>
+        <td><span style="color: #ef4444;">✗ No</span></td>
+        <td><span style="color: #059669;">✓ Gen-AI Generated</span></td>
+      </tr>
+      <tr>
+        <td>Skill-Matched Jobs</td>
+        <td><span style="color: #f97316;">• Keyword only</span></td>
+        <td><span style="color: #ef4444;">✗ No</span></td>
+        <td><span style="color: #059669;">✓ Context-Aware Matching</span></td>
+      </tr>
+      <tr>
+        <td>Psychological Profiling</td>
+        <td><span style="color: #ef4444;">✗ No</span></td>
+        <td><span style="color: #f97316;">• Static</span></td>
+        <td><span style="color: #059669;">✓ Deep Cognitive Assessment</span></td>
+      </tr>
+      <tr>
+        <td>Personalization Level</td>
+        <td><span style="color: #ef4444;">✗ Low</span></td>
+        <td><span style="color: #f97316;">• Medium</span></td>
+        <td><span style="color: #059669;">✓✓ Extremely High</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-achievement">
+    <div class="key-achievement-title">✦ KEY ACHIEVEMENT</div>
+    <div>A single integrated portal combining psychological career discovery + AI customized action roadmaps + real-time skill-specific internship hunting — answering "What should I do?" and "How do I get there?" simultaneously.</div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page">
+  <div class="section-header">
+    <div class="sec-num">6</div>
+    <div class="sec-title">
+      <h2>Platform Strategy</h2>
+      <p>Target demographics and ecosystem value</p>
+    </div>
+  </div>
+
+  <div class="cards-grid" style="grid-template-columns: repeat(2, 1fr);">
+    <div class="small-card">
+      <div style="font-size: 0.7rem; color: #0d9488; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">FOR INDIVIDUALS</div>
+      <h5>B2C Discovery Platform</h5>
+      <p>Direct-to-user access for students and professionals seeking career clarity and personalized growth roadmaps.</p>
+    </div>
+    <div class="small-card">
+      <div style="font-size: 0.7rem; color: #0d9488; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">API STRATEGY</div>
+      <h5>Integration Services</h5>
+      <p>Embedding AI roadmap generation and job matching as API services within university LMS portals.</p>
+    </div>
+  </div>
+
+  <h4 style="margin-top: 30px;">Target Users</h4>
+  <div class="customer-badges">
+    <div class="customer-badge">🎓 University Students</div>
+    <div class="customer-badge">🔄 Career Switchers</div>
+    <div class="customer-badge">🏢 Educational Institutions</div>
+    <div class="customer-badge">🚀 Working Professionals</div>
+  </div>
+
+  <div class="section-header">
+    <div class="sec-num">7</div>
+    <div class="sec-title">
+      <h2>Applications</h2>
+      <p>Real-world deployment scenarios</p>
+    </div>
+  </div>
+
+  <div class="app-grid">
+    <div class="app-card" style="border-top: 4px solid #10b981;">
+      <h4>🎓 Early Career Planning</h4>
+      <p><strong>Scenario:</strong> High school / early college students confused about majors.<br><strong>Impact:</strong> The Multi-Layered Assessment prevents wasted tuition by aligning students with paths fitting their latent cognitive skills.</p>
+    </div>
+    <div class="app-card" style="border-top: 4px solid #f59e0b;">
+      <h4>🔄 Mid-Career Transition</h4>
+      <p><strong>Scenario:</strong> Stuck professionals wanting to switch to Tech or newer fields.<br><strong>Impact:</strong> Gen AI Roadmaps provide the exact bridge curriculum required, highlighting transferable skills for maximum efficiency.</p>
+    </div>
+    <div class="app-card" style="border-top: 4px solid #3b82f6;">
+      <h4>🎯 Targeted Internship Hunting</h4>
+      <p><strong>Scenario:</strong> Junior devs struggling to land first roles.<br><strong>Impact:</strong> Job finder module filters out noise, matching their current verified tech stack directly to immediate openings.</p>
+    </div>
+    <div class="app-card" style="border-top: 4px solid #8b5cf6;">
+      <h4>🏫 University Counseling Centers</h4>
+      <p><strong>Scenario:</strong> Overwhelmed campus placement cells.<br><strong>Impact:</strong> Platform acts as a co-pilot for counselors, generating baseline profiles and paths for hundreds of students simultaneously.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page">
+  <div class="section-header">
+    <div class="sec-num">8</div>
+    <div class="sec-title">
+      <h2>Future Scope</h2>
+      <p>Roadmap for enhanced capabilities</p>
+    </div>
+  </div>
+
+  <ul class="future-list">
+    <li>
+      <h5>Predictive Career Analytics</h5>
+      <p>Integration of macro-economic data trends to suggest careers that will be high-demand 5-10 years in the future.</p>
+    </li>
+    <li>
+      <h5>Skill Validation Ecosystem</h5>
+      <p>Implementing coding sandboxes and interactive tests within the platform to cryptographically verify a user's claimed skills.</p>
+    </li>
+    <li>
+      <h5>Mentorship Matchmaking</h5>
+      <p>Connecting users directly with industry professionals currently working in their Target Role for real-world networking.</p>
+    </li>
+    <li>
+      <h5>Hyper-Localized Job Feeds</h5>
+      <p>Expanding the internship and job finder algorithms with deeper geographic awareness and exclusive startup hiring partner integrations.</p>
+    </li>
+  </ul>
+
+  <div class="highlight-banner">
+    The modular architecture ensures each enhancement integrates incrementally without full redesign — making this a future-proof platform for AI-powered human capital development.
+  </div>
+
+  <div class="key-achievement" style="background:#0f172a;">
+    <div class="key-achievement-title" style="color:#64748b;">SUMMARY</div>
+    <div style="font-size: 0.95rem;">
+      This project delivers a unified career intelligence system leveraging Gen AI to provide multi-layered assessment, definitive role targeting, custom roadmap generation, and precision job matching — creating a holistic ecosystem that outperforms all existing fragmented career tools.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
